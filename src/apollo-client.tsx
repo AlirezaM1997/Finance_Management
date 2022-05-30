@@ -10,18 +10,27 @@ import {
 import { onError } from "@apollo/client/link/error";
 
 import { setContext } from "@apollo/client/link/context";
-import Cookies from "universal-cookie";
 import { useAllState } from "./Provider";
+
+type GraphQLError ={
+  message: string;
+  location: any ;
+  path? : any
+}
+interface IOnError {
+  graphQLErrors: any;
+  networkError: any;
+  operation: any;
+
+}
 
 const graphqlEndpoint = "http://localhost:80/graphql";
 
-export default function CustomApolloProvider(props) {
-  const cookies = new Cookies();
-  // const token = cookies.get("token");
+export default function CustomApolloProvider(props : any) {
 
   const { token } = useAllState();
 
-  const thisRef = useRef()
+  const thisRef = useRef<string>()
   thisRef.current = token
 
   const client = useMemo(() => {
@@ -35,10 +44,10 @@ export default function CustomApolloProvider(props) {
       };
     });
 
-    const errorLink = onError(({ graphQLErrors, networkError, operation }) => {
+    const errorLink = onError(({ graphQLErrors , networkError, operation }) => {
       if (graphQLErrors) {
-        graphQLErrors.forEach(({ message, location, path }) => {
-          console.log(`message:${message} location:${location}`);
+        graphQLErrors.forEach(({ message}) => {
+          console.log(`message:${message}`);
         });
       }
 
@@ -46,6 +55,17 @@ export default function CustomApolloProvider(props) {
         console.log(`networkerror: ${networkError}`);
       }
     });
+    // const errorLink = onError(({ graphQLErrors , networkError, operation }) => {
+    //   if (graphQLErrors) {
+    //     graphQLErrors.forEach(({ message, location , path }) => {
+    //       console.log(`message:${message} location:${location}`);
+    //     });
+    //   }
+
+    //   if (networkError) {
+    //     console.log(`networkerror: ${networkError}`);
+    //   }
+    // });
 
     const httpLink = createHttpLink({
       uri: graphqlEndpoint,

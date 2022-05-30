@@ -11,6 +11,11 @@ import SignIn from "./components/SignIn";
 import SignUp from "./components/SignUp";
 import Provider, { useAllState } from "./Provider";
 
+import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
+import Expenses from "./components/Expenses";
+import Reports from "./components/Reports";
+
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
@@ -24,10 +29,7 @@ const App = () => {
     const token = cookies.get("token");
     setToken(token);
   }, []);
-  console.log("%c token in route :", "background: #222; color: #bada55", token);
-
-  // console.log('token :', token);
-  // if (!token) return
+  // console.log("%c token in route :", "background: #222; color: #bada55", token);
 
   return (
     <BrowserRouter>
@@ -36,8 +38,26 @@ const App = () => {
         <Route path="/signup" element={<SignUp />}></Route>
         <Route
           path="/dashboard"
-          element={token ? <Dashboard /> : <h2>loading ...!</h2>}
-        ></Route>
+          element={
+            token ? (
+              <Dashboard />
+            ) : (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginTop: "2rem",
+                }}
+              >
+                <CircularProgress />
+              </Box>
+            )
+          }
+        >
+          <Route path="/dashboard/expenses" element={<Expenses />}></Route>
+          <Route path="/dashboard/reports" element={<Reports />}></Route>
+        </Route>
       </Routes>
     </BrowserRouter>
   );

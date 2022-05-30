@@ -13,6 +13,7 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { LoadingButton } from "@mui/lab";
+import SaveIcon from "@mui/icons-material/Save";
 
 import { Link, useNavigate } from "react-router-dom";
 import { gql, useMutation } from "@apollo/client";
@@ -54,11 +55,14 @@ export default function SignIn() {
       });
       cookies.set("token", token);
       setToken(token);
-      console.log("%c token in login from cookie :", 'background: red; color: black', token);
+      // console.log(
+      //   "%c token in login from cookie :",
+      //   "background: red; color: black",
+      //   token
+      // );
 
       setLoading(false);
       navToDashboard("/dashboard");
-
     } catch (error) {
       console.log(error);
     }
@@ -109,10 +113,12 @@ export default function SignIn() {
             />
             <LoadingButton
               loading={loading}
-              type="submit"
+              loadingPosition="start"
+              startIcon={loading ? <SaveIcon /> : null}
+              variant='contained'
               fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
+              sx={{ mt: 2, mb: 1 }}
+              type='submit'
             >
               Sign In
             </LoadingButton>
@@ -121,12 +127,15 @@ export default function SignIn() {
                 <Link to="#">Forgot password?</Link>
               </Grid>
               <Grid item>
-                <Link to={"/signup"}>{"Don't have an account? Sign Up"}</Link>
+                Don't have an account?{" "}
+                <Link style={{ color: "red" }} to={"/signup"}>
+                  {" Sign Up"}
+                </Link>
+               
               </Grid>
             </Grid>
           </Box>
         </Box>
-        {/* <Copyright sx={{ mt: 8, mb: 4 }} /> */}
       </Container>
     </ThemeProvider>
   );
