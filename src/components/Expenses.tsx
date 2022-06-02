@@ -10,6 +10,8 @@ import TableRow from "@mui/material/TableRow";
 import {
   Box,
   Button,
+  Chip,
+  FormControl,
   Grid,
   InputLabel,
   TextField,
@@ -24,7 +26,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import OutlinedInput from "@mui/material/OutlinedInput";
-import ListItemText from '@mui/material/ListItemText';
+import ListItemText from "@mui/material/ListItemText";
 
 //icon
 import { DoneOutline, FiberNew } from "@mui/icons-material";
@@ -46,6 +48,7 @@ import {
 import "leaflet/dist/leaflet.css";
 import { Icon, Map } from "leaflet";
 import markerIconPng from "leaflet/dist/images/marker-icon.png";
+import { Theme, useTheme } from "@mui/material/styles";
 
 // Generate Order Data
 function createData(
@@ -102,6 +105,7 @@ const rows = [
   ),
 ];
 
+////////////Select Input//////////////
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -113,7 +117,17 @@ const MenuProps = {
   },
 };
 
-//modal
+function getStyles(name: string, tags: readonly string[], theme: Theme) {
+  return {
+    fontWeight:
+      tags.indexOf(name) === -1
+        ? theme.typography.fontWeightRegular
+        : theme.typography.fontWeightMedium,
+  };
+}
+///////////////////////////////////////
+
+/////////////Modal////////////////////
 const style = {
   position: "absolute" as "absolute",
   top: "50%",
@@ -125,6 +139,7 @@ const style = {
   p: 4,
   borderRadius: 1,
 };
+////////////////////////////////
 
 const MAIN_QUERY = gql`
   query Query {
@@ -160,15 +175,15 @@ const ADD_EXPENSE_MUTATION = gql`
 `;
 
 const Expenses = () => {
+  ////////Modal///////////
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const [tag, setTag] = React.useState("");
+  ///////////Date//////////////////
+  const [date, setDate] = React.useState<Date | null>(null);
 
-  // const mapRef = useRef<any>();
-  // console.log(mapRef.current);
-
+  /////////Leaflet//////////
   const [initialPosition, setInitialPosition] = useState<[number, number]>([
     0, 0,
   ]);
@@ -207,36 +222,34 @@ const Expenses = () => {
     ) : null;
   };
 
-  // const handleChange = (event: SelectChangeEvent) => {
-  //   setTag(event.target.value as string);
-  //   // console.log(tag);
-  // };
+  ////////Select Input////////////
+  const theme = useTheme();
+  const [tags, setTags] = React.useState<string[]>([]);
 
-  const [personName, setPersonName] = React.useState<string[]>([]);
-
-  const handleChange = (event: SelectChangeEvent<typeof personName>) => {
+  const handleChange = (event: SelectChangeEvent<typeof tags>) => {
     const {
       target: { value },
     } = event;
-    setPersonName(
-      // On autofill we get a stringified value.
-      typeof value === "string" ? value.split(",") : value
+    console.log(event);
+    const arr = allData.getMyTags.filter(
+      (i: any, j: number) => i.name === value[j]
     );
+    console.log(arr);
+    const array: number[] = [];
+    arr.filter((i:any) => array.push(i._id));
+    setTags(typeof value === "string" ? value.split(",") : value);
   };
+  console.log("array", array);
 
-  const [tagList, setTagList] = useState([{ name: "test", color: "red" }]);
-
+  ///////////Query/////////////////
   const [send_muation] = useMutation(ADD_EXPENSE_MUTATION);
 
-  // console.log(_data);
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    console.log("llllllllllll");
-
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const _data = {
       amount: Number(data.get("amount")),
-      tags: tagList,
+      tags: ["1654068499767245206"],
       date: date,
       geo: {
         lat: selectedPosition[0],
@@ -254,7 +267,6 @@ const Expenses = () => {
           data: _data,
         },
       });
-      // console.log(_data);
 
       console.log(status);
 
@@ -264,27 +276,6 @@ const Expenses = () => {
     }
   };
 
-  // const [info, setInfo] = useState<IUser>();
-  // const { error, loading, data } = useQuery(ME_QUERY, {
-  //   onCompleted: setInfo,
-  // });
-
-  // if (error) return <p>Dashboard : You are not login!!!</p>;
-  // if (loading)
-  //   return (
-  //     <Box
-  //       sx={{
-  //         display: "flex",
-  //         justifyContent: "center",
-  //         alignItems: "center",
-  //         marginTop: "2rem",
-  //       }}
-  //     >
-  //       <CircularProgress />
-  //     </Box>
-  //   );
-
-  const [date, setDate] = React.useState<Date | null>(null);
   const [allData, setAllData] = React.useState<any | null>(null);
 
   const { error, loading, data } = useQuery(MAIN_QUERY, {
@@ -305,7 +296,7 @@ const Expenses = () => {
       </Box>
     );
   if (error) return <p>Error :(</p>;
-  console.log(allData);
+  // console.log(allData);
 
   return (
     <>
@@ -410,26 +401,46 @@ const Expenses = () => {
                     />
                   </LocalizationProvider>
                 </Grid>
-
-                
-                  <InputLabel id="demo-multiple-label">Tag</InputLabel>
-                  <Select
-                    labelId="demo-multiple-label"
-                    id="demo-multiple"
-                    fullWidth
-                    value={personName}
-                    onChange={handleChange}
-                    input={<OutlinedInput label="Tag" />}
-                    renderValue={(selected) => selected.join(", ")}
-                    MenuProps={MenuProps}
-                  >
-                    {allData.getMyTags.map((item : any, i:number) => (
-                      <MenuItem key={i} value={item.name}>
-                        <ListItemText primary={item.name} />
-                      </MenuItem>
-                    ))}
-                  </Select>
-                
+                <Grid item>
+                  <FormControl sx={{ m: 1, width: 300 }}>
+                    <InputLabel id="demo-multiple-tags-label">Tags</InputLabel>
+                    <Select
+                      labelId="demo-multiple-tags-label"
+                      id="demo-multiple-tags"
+                      multiple
+                      value={tags}
+                      onChange={handleChange}
+                      input={
+                        <OutlinedInput id="select-multiple-tags" label="Tags" />
+                      }
+                      renderValue={(selected) => (
+                        <Box
+                          sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}
+                        >
+                          {selected.map((value) => (
+                            <Chip key={value} label={value} />
+                          ))}
+                        </Box>
+                      )}
+                      MenuProps={MenuProps}
+                    >
+                      {allData.getMyTags.map(
+                        (
+                          item: { name: string; _id: number; color: string },
+                          i: React.Key | null | undefined
+                        ) => (
+                          <MenuItem
+                            key={i}
+                            value={item.name}
+                            style={getStyles(item.name, tags, theme)}
+                          >
+                            {item.name}
+                          </MenuItem>
+                        )
+                      )}
+                    </Select>
+                  </FormControl>
+                </Grid>
                 <Grid item>
                   <Button
                     type="submit"
