@@ -15,6 +15,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import Expenses from "./components/Expenses";
 import Reports from "./components/Reports";
+import CreateTags from "./components/CreateTags";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -56,6 +57,7 @@ const App = () => {
           }
         >
           <Route path="/dashboard/expenses" element={<Expenses />}></Route>
+          <Route path="/dashboard/createtags" element={<CreateTags />}></Route>
           <Route path="/dashboard/reports" element={<Reports />}></Route>
         </Route>
       </Routes>

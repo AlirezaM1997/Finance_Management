@@ -20,10 +20,9 @@ import Paper from "@mui/material/Paper";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import { MainListItems, SecondaryListItems } from "./listItems";
+import { MainListItems, SecondaryListItems } from "./SideMenu";
 import Chart from "./Chart";
 import Deposits from "./Deposits";
-import Orders from "./Orders";
 import CircularProgress from "@mui/material/CircularProgress";
 import { Outlet, Link } from "react-router-dom";
 
@@ -153,6 +152,14 @@ const Dashboard: FC | any = () => {
                   <NotificationsIcon />
                 </Badge>
               </IconButton>
+              <Typography
+                component="h6"
+                variant="h6"
+                noWrap
+                ml='1rem'
+              >
+                {info?.me.username}
+              </Typography>
             </Toolbar>
           </AppBar>
           <Drawer

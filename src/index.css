@@ -1,16 +1,36 @@
-a{
-   text-decoration: none;
-   color: initial;
+a {
+  text-decoration: none;
+  color: initial;
 }
 @-webkit-keyframes autofill {
-    0%,
-    100% {
-      background: white !important;
-    }
+  0%,
+  100% {
+    background: white !important;
   }
-  input:-webkit-autofill,
-  input:-webkit-autofill:hover,
-  input:-webkit-autofill:focus,
-  input:-webkit-autofill:active {
-    transition: background-color 5000s ease-in-out 0s;
-  }
+}
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  transition: background-color 5000s ease-in-out 0s;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+
+/* mui */
+.MuiInputBase-input{
+  padding: 16.5px 14px !important;
+}
+/* .MuiInput-underline:before{
+  border-bottom: none !important;
+}
+.MuiInput-underline::after{
+  border-bottom: none !important;
+} */

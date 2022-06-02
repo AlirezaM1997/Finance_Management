@@ -9,7 +9,7 @@ import PeopleIcon from "@mui/icons-material/People";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import LayersIcon from "@mui/icons-material/Layers";
 import AssignmentIcon from "@mui/icons-material/Assignment";
-import { ExitToApp } from "@mui/icons-material";
+import { ExitToApp, LabelRounded } from "@mui/icons-material";
 import Cookies from "universal-cookie";
 import { useAllState } from "../Provider";
 import { Link } from "react-router-dom";
@@ -31,6 +31,14 @@ export const MainListItems = () => {
             <ShoppingCartIcon />
           </ListItemIcon>
           <ListItemText primary="Expenses" />
+        </ListItemButton>
+      </Link>
+      <Link to={"/dashboard/createtags"}>
+        <ListItemButton>
+          <ListItemIcon>
+            <LabelRounded />
+          </ListItemIcon>
+          <ListItemText primary="Create Tags" />
         </ListItemButton>
       </Link>
       <Link to={'/dashboard/reports'}>
