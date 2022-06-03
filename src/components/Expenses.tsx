@@ -197,7 +197,7 @@ const Expenses = () => {
       setInitialPosition([latitude, longitude]);
     });
   }, []);
-  console.log(selectedPosition);
+  // console.log(selectedPosition);
 
   const Markers = () => {
     const map = useMapEvents({
@@ -225,21 +225,28 @@ const Expenses = () => {
   ////////Select Input////////////
   const theme = useTheme();
   const [tags, setTags] = React.useState<string[]>([]);
+  const [_tags, _setTags] = React.useState<number[]>([]);
 
   const handleChange = (event: SelectChangeEvent<typeof tags>) => {
     const {
       target: { value },
     } = event;
-    console.log(event);
-    const arr = allData.getMyTags.filter(
-      (i: any, j: number) => i.name === value[j]
-    );
-    console.log(arr);
-    const array: number[] = [];
-    arr.filter((i:any) => array.push(i._id));
+
     setTags(typeof value === "string" ? value.split(",") : value);
   };
-  console.log("array", array);
+  useEffect(() => {
+    // console.log("tags:", tags);
+    const arr = allData?.getMyTags.filter(
+      (i: any, j: number) => i.name === tags[j]
+    );
+    // console.log("arr:", arr);
+
+    _setTags(arr?.map((i: any) => i._id));
+  }, [tags]);
+
+  useEffect(() => {
+    console.log("_tags", _tags);
+  }, [_tags]);
 
   ///////////Query/////////////////
   const [send_muation] = useMutation(ADD_EXPENSE_MUTATION);
@@ -249,7 +256,7 @@ const Expenses = () => {
     const data = new FormData(event.currentTarget);
     const _data = {
       amount: Number(data.get("amount")),
-      tags: ["1654068499767245206"],
+      tags: _tags,
       date: date,
       geo: {
         lat: selectedPosition[0],
@@ -267,7 +274,11 @@ const Expenses = () => {
           data: _data,
         },
       });
-
+      if (status === 200) {
+        setTags([]);
+        setDate(null);
+        data.set("amount", "");
+      }
       console.log(status);
 
       // navToDashboard("/dashboard");
@@ -296,7 +307,7 @@ const Expenses = () => {
       </Box>
     );
   if (error) return <p>Error :(</p>;
-  // console.log(allData);
+  console.log(allData);
 
   return (
     <>
@@ -316,23 +327,39 @@ const Expenses = () => {
             <TableRow>
               <TableCell style={{ fontWeight: "bold" }}>Date</TableCell>
               <TableCell style={{ fontWeight: "bold" }}>Amount</TableCell>
-              <TableCell style={{ fontWeight: "bold" }}>Geo</TableCell>
-              <TableCell style={{ fontWeight: "bold" }}>Adress</TableCell>
-              <TableCell style={{ fontWeight: "bold" }} align="right">
-                Sale Amount
+              <TableCell style={{ fontWeight: "bold" }}>Place</TableCell>
+              <TableCell style={{ fontWeight: "bold" }}>tags</TableCell>
+              <TableCell style={{ fontWeight: "bold" }}>
+                Action
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => (
-              <TableRow key={row._id}>
-                <TableCell>{row.date}</TableCell>
-                <TableCell>{row.name}</TableCell>
-                <TableCell>{row.shipTo}</TableCell>
-                <TableCell>{row.paymentMethod}</TableCell>
-                <TableCell align="right">{`$${row.amount}`}</TableCell>
-              </TableRow>
-            ))}
+            {allData.getMyExpenses.map(
+              (row: {
+                _id: React.Key | number;
+                date: string | number;
+                amount: number;
+                place: string;
+                tags: { name: string; color: string }[];
+              }) => (
+                <TableRow key={row._id}>
+                  <TableCell>{row.date}</TableCell>
+                  <TableCell>{row.amount}</TableCell>
+                  <TableCell>{row.place}</TableCell>
+                  <TableCell>
+                    {row.tags.map(
+                      (i: { name: string; color: string }, j: number) => (
+                        <span key={j}>{i.name}</span>
+                      )
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Button>DELETE</Button>
+                  </TableCell>
+                </TableRow>
+              )
+            )}
           </TableBody>
         </Table>
       </Box>
@@ -370,13 +397,12 @@ const Expenses = () => {
                 p={1}
                 style={{
                   width: "270px",
-                  display: "flex",
+                  display: "inline",
                   flexDirection: "column",
                 }}
               >
-                <Grid item>
+                <Grid item mb={3}>
                   <TextField
-                    // margin="normal"
                     required
                     fullWidth
                     id="amount"
@@ -388,7 +414,7 @@ const Expenses = () => {
                   />
                 </Grid>
 
-                <Grid item>
+                <Grid item mb={3}>
                   <LocalizationProvider dateAdapter={AdapterDateFns}>
                     <DatePicker
                       label="Select Date"
@@ -401,15 +427,15 @@ const Expenses = () => {
                     />
                   </LocalizationProvider>
                 </Grid>
-                <Grid item>
-                  <FormControl sx={{ m: 1, width: 300 }}>
+                <Grid item display="flex" mb={3}>
+                  <FormControl sx={{ width: "100%" }}>
                     <InputLabel id="demo-multiple-tags-label">Tags</InputLabel>
                     <Select
                       labelId="demo-multiple-tags-label"
                       id="demo-multiple-tags"
                       multiple
                       value={tags}
-                      onChange={handleChange}
+                      onChange={(e) => handleChange(e)}
                       input={
                         <OutlinedInput id="select-multiple-tags" label="Tags" />
                       }
@@ -424,7 +450,7 @@ const Expenses = () => {
                       )}
                       MenuProps={MenuProps}
                     >
-                      {allData.getMyTags.map(
+                      {allData?.getMyTags.map(
                         (
                           item: { name: string; _id: number; color: string },
                           i: React.Key | null | undefined
@@ -453,7 +479,7 @@ const Expenses = () => {
                 </Grid>
               </Grid>
 
-              <Box width="400px" p={1}>
+              <Box p={1}>
                 <MapContainer
                   // center={[51.505, -0.09]}
                   center={selectedPosition || initialPosition}

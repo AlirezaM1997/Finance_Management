@@ -34,7 +34,7 @@ export default function CustomApolloProvider(props : any) {
   thisRef.current = token
 
   const client = useMemo(() => {
-    console.log("%c token in apollo client", "background:yellow", token);
+    // console.log("%c token in apollo client", "background:yellow", token);
     const authLink = setContext((_, { headers }) => {
       return {
         headers: {
