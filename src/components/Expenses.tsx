@@ -10,10 +10,12 @@ import TableRow from "@mui/material/TableRow";
 import {
   Box,
   Button,
+  Checkbox,
   Chip,
   FormControl,
   Grid,
   InputLabel,
+  ListItemText,
   TextField,
   Typography,
 } from "@mui/material";
@@ -26,84 +28,41 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import OutlinedInput from "@mui/material/OutlinedInput";
-import ListItemText from "@mui/material/ListItemText";
+import { CircularProgress } from "@material-ui/core";
+import { Theme, useTheme } from "@mui/material/styles";
+
+import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import { Icon, Map } from "leaflet";
+import markerIconPng from "leaflet/dist/images/marker-icon.png";
 
 //icon
 import { DoneOutline, FiberNew } from "@mui/icons-material";
 
 //components
 import Title from "./Title";
-import TagInput from "./TagInput";
-import { CircularProgress, Input } from "@material-ui/core";
 
-import {
-  MapContainer,
-  TileLayer,
-  useMap,
-  Marker,
-  Popup,
-  MapContainerProps,
-  useMapEvents,
-} from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import { Icon, Map } from "leaflet";
-import markerIconPng from "leaflet/dist/images/marker-icon.png";
-import { Theme, useTheme } from "@mui/material/styles";
-
-// Generate Order Data
-function createData(
-  _id: number,
-  date: string,
-  name: string,
-  shipTo: string,
-  paymentMethod: string,
-  amount: number
-) {
-  return { _id, date, name, shipTo, paymentMethod, amount };
-}
-
-const rows = [
-  createData(
-    0,
-    "16 Mar, 2019",
-    "Elvis Presley",
-    "Tupelo, MS",
-    "VISA ⠀•••• 3719",
-    312.44
-  ),
-  createData(
-    1,
-    "16 Mar, 2019",
-    "Paul McCartney",
-    "London, UK",
-    "VISA ⠀•••• 2574",
-    866.99
-  ),
-  createData(
-    2,
-    "16 Mar, 2019",
-    "Tom Scholz",
-    "Boston, MA",
-    "MC ⠀•••• 1253",
-    100.81
-  ),
-  createData(
-    3,
-    "16 Mar, 2019",
-    "Michael Jackson",
-    "Gary, IN",
-    "AMEX ⠀•••• 2000",
-    654.39
-  ),
-  createData(
-    4,
-    "15 Mar, 2019",
-    "Bruce Springsteen",
-    "Long Branch, NJ",
-    "VISA ⠀•••• 5919",
-    212.79
-  ),
-];
+const parsIsoDate = (date: string) => {
+  const months = [
+    "Janury",
+    "Februry",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  const a = new Date(date);
+  const year = a.getFullYear();
+  const month = a.getMonth();
+  const day = a.getDay();
+  return `${months[month - 1]} ${day} ,${year}`;
+};
 
 ////////////Select Input//////////////
 const ITEM_HEIGHT = 48;
@@ -174,6 +133,14 @@ const ADD_EXPENSE_MUTATION = gql`
   }
 `;
 
+const DELETE_EXPENSE_MUTATION = gql`
+  mutation Mutation($id: ID!) {
+    delete_expense(_id: $id) {
+      status
+    }
+  }
+`;
+
 const Expenses = () => {
   ////////Modal///////////
   const [open, setOpen] = React.useState(false);
@@ -233,30 +200,32 @@ const Expenses = () => {
     } = event;
 
     setTags(typeof value === "string" ? value.split(",") : value);
-  };
-  useEffect(() => {
-    // console.log("tags:", tags);
-    const arr = allData?.getMyTags.filter(
-      (i: any, j: number) => i.name === tags[j]
-    );
-    // console.log("arr:", arr);
 
-    _setTags(arr?.map((i: any) => i._id));
+    console.log("tags:", tags);
+  };
+
+  // useEffect(() => {
+  //   const arr = allData?.getMyTags.filter(
+  //     (i: any, j: number) => i.name === tags[j]
+  //   );
+  //   console.log("arr:", arr);
+
+  //   _setTags(arr?.map((i: any) => i._id));
+  // }, [tags]);
+
+  useEffect(() => {
+    console.log("tags", tags);
   }, [tags]);
 
-  useEffect(() => {
-    console.log("_tags", _tags);
-  }, [_tags]);
-
   ///////////Query/////////////////
-  const [send_muation] = useMutation(ADD_EXPENSE_MUTATION);
+  const [send_muation_new_expense] = useMutation(ADD_EXPENSE_MUTATION);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const _data = {
       amount: Number(data.get("amount")),
-      tags: _tags,
+      tags: tags,
       date: date,
       geo: {
         lat: selectedPosition[0],
@@ -269,15 +238,17 @@ const Expenses = () => {
         data: {
           create_expense: { status },
         },
-      } = await send_muation({
+      } = await send_muation_new_expense({
         variables: {
           data: _data,
         },
       });
       if (status === 200) {
-        setTags([]);
-        setDate(null);
-        data.set("amount", "");
+        // setTags([]);
+        // setDate(null);
+        // data.set("amount", "");
+        refetch();
+        handleClose();
       }
       console.log(status);
 
@@ -287,11 +258,36 @@ const Expenses = () => {
     }
   };
 
+  const [send_muation_delete_expense] = useMutation(DELETE_EXPENSE_MUTATION);
+
+  const deleteExpense = async (_id: number) => {
+    try {
+      const {
+        data: {
+          delete_expense: { status },
+        },
+      } = await send_muation_delete_expense({
+        variables: {
+          id: _id,
+        },
+      });
+      if (status === 200) refetch();
+
+      console.log(status);
+      console.log(allData);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const [allData, setAllData] = React.useState<any | null>(null);
 
-  const { error, loading, data } = useQuery(MAIN_QUERY, {
-    onCompleted: setAllData,
-  });
+  const { error, loading, data, refetch } = useQuery(MAIN_QUERY);
+
+  useEffect(() => {
+    setAllData(data);
+    console.log(allData);
+  }, [data]);
 
   if (loading)
     return (
@@ -329,33 +325,44 @@ const Expenses = () => {
               <TableCell style={{ fontWeight: "bold" }}>Amount</TableCell>
               <TableCell style={{ fontWeight: "bold" }}>Place</TableCell>
               <TableCell style={{ fontWeight: "bold" }}>tags</TableCell>
-              <TableCell style={{ fontWeight: "bold" }}>
-                Action
-              </TableCell>
+              <TableCell style={{ fontWeight: "bold" }}>Action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {allData.getMyExpenses.map(
+            {allData?.getMyExpenses.map(
               (row: {
-                _id: React.Key | number;
-                date: string | number;
+                _id: number;
+                date: string;
                 amount: number;
                 place: string;
                 tags: { name: string; color: string }[];
               }) => (
                 <TableRow key={row._id}>
-                  <TableCell>{row.date}</TableCell>
+                  <TableCell>{parsIsoDate(row.date)}</TableCell>
                   <TableCell>{row.amount}</TableCell>
                   <TableCell>{row.place}</TableCell>
                   <TableCell>
                     {row.tags.map(
-                      (i: { name: string; color: string }, j: number) => (
-                        <span key={j}>{i.name}</span>
+                      (i: { name: string; color: string }, j: React.Key) => (
+                        <Chip
+                          style={{
+                            background: i.color,
+                            color: "white",
+                            margin: "0.3rem 0.3rem 0.3rem 0",
+                          }}
+                          label={i.name}
+                          key={j}
+                        />
                       )
                     )}
                   </TableCell>
                   <TableCell>
-                    <Button>DELETE</Button>
+                    <Button
+                      onClick={() => deleteExpense(row._id)}
+                      style={{ padding: "0", justifyContent: "flex-start" }}
+                    >
+                      DELETE
+                    </Button>
                   </TableCell>
                 </TableRow>
               )
@@ -444,7 +451,12 @@ const Expenses = () => {
                           sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}
                         >
                           {selected.map((value) => (
-                            <Chip key={value} label={value} />
+                            <Chip
+                              key={value}
+                              label={allData?.getMyTags.filter(
+                                (i: any) => i._id === value
+                              )[0].name}
+                            />
                           ))}
                         </Box>
                       )}
@@ -457,7 +469,7 @@ const Expenses = () => {
                         ) => (
                           <MenuItem
                             key={i}
-                            value={item.name}
+                            value={item._id}
                             style={getStyles(item.name, tags, theme)}
                           >
                             {item.name}

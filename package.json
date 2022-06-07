@@ -5,6 +5,7 @@
   "dependencies": {
     "@apollo/client": "^3.6.5",
     "@date-io/date-fns": "^2.14.0",
+    "@dmitrychebayewski/material-ui-4-color": "^1.2.5",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
     "@hookform/resolvers": "^2.8.10",

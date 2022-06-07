@@ -1,8 +1,33 @@
 import { gql, useMutation } from "@apollo/client";
-import { Box, Button, TextField, Typography } from "@mui/material";
-
+import { Box, Button, TextField } from "@mui/material";
+import ColorPicker from "material-ui-color-picker";
 
 import React, { useState } from "react";
+const MAIN_QUERY = gql`
+  query Query {
+    getMyExpenses {
+      _id
+      amount
+      tags {
+        _id
+        name
+        color
+      }
+      geo {
+        lat
+        lon
+      }
+      date
+    }
+    getMyTags {
+      _id
+      name
+      color
+    }
+  }
+`;
+
+
 
 const ADD_TAG_MUTATION = gql`
   mutation Mutation($data: tagInfo!) {
@@ -13,11 +38,8 @@ const ADD_TAG_MUTATION = gql`
   }
 `;
 
-
-
 function CreateTags() {
-
-
+  const [color, setColor] = useState("#6B6B6B");
 
   const [send_muation] = useMutation(ADD_TAG_MUTATION);
 
@@ -34,7 +56,7 @@ function CreateTags() {
         variables: {
           data: {
             name: data.get("newTag"),
-            color: 'red',
+            color,
           },
         },
       });
@@ -53,8 +75,10 @@ function CreateTags() {
         pr="10px"
         pt="80px"
         width="100%"
+        display='flex'
+        justifyContent='center'
       >
-        <Box>
+        <Box width='50%'>
           <TextField
             margin="normal"
             required
@@ -65,6 +89,16 @@ function CreateTags() {
             autoComplete="newTag"
             autoFocus
           />
+          <label style={{margin:'8px 0' , display:'block',fontSize:'12px'}}>SELECT COLOR FOR TAG :</label>
+          <ColorPicker
+            name="color"
+            style={{ width: "100%", background: color , cursor:'pointer' , borderRadius:'0.3rem', borderBottom:'none'}}
+            // defaultValue="gray"
+            value={color}
+            onChange={(e) => setColor(e)}
+            autoComplete='off'
+          />
+         
 
           <Button
             type="submit"
