@@ -3,7 +3,7 @@ import { gql, useMutation, useQuery } from "@apollo/client";
 
 //mui
 import { CircularProgress } from "@material-ui/core";
-import { Box, Button, TextField } from "@mui/material";
+import { Box, Button, TextField, Typography } from "@mui/material";
 import ColorPicker from "material-ui-color-picker";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -199,6 +199,19 @@ function CreateTags() {
         flexDirection="column"
         justifyContent="center"
       >
+        <Typography
+          variant="h4"
+          gutterBottom
+          fontFamily="monospace"
+          fontWeight="600"
+          borderBottom="dotted 1px #1976d2"
+
+          pb={2}
+          align="center"
+          component="div"
+        >
+         #Tags
+        </Typography>
         <Box
           display="flex"
           flexDirection="column"

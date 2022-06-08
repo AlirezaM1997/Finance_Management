@@ -1,5 +1,5 @@
 import React, { useContext, useMemo, useRef, useEffect } from "react";
-
+import { createUploadLink } from "apollo-upload-client";
 import {
   ApolloClient,
   createHttpLink,
@@ -67,7 +67,7 @@ export default function CustomApolloProvider(props : any) {
     //   }
     // });
 
-    const httpLink = createHttpLink({
+    const httpLink = createUploadLink({
       uri: graphqlEndpoint,
     });
 

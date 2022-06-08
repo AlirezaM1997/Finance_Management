@@ -308,6 +308,18 @@ const Expenses = () => {
   return (
     <>
       <Box pl="250px" pr="10px" pt="80px" width="100%">
+        <Typography
+          variant="h4"
+          gutterBottom
+          fontFamily="monospace"
+          fontWeight="600"
+          borderBottom="dotted 1px #1976d2"
+          pb={2}
+          align="center"
+          component="div"
+        >
+          Expenses
+        </Typography>
         <Box display="flex" justifyContent="space-between" mb="15px">
           <Title>Recent Expenses</Title>
           <Button
@@ -453,9 +465,11 @@ const Expenses = () => {
                           {selected.map((value) => (
                             <Chip
                               key={value}
-                              label={allData?.getMyTags.filter(
-                                (i: any) => i._id === value
-                              )[0].name}
+                              label={
+                                allData?.getMyTags.filter(
+                                  (i: any) => i._id === value
+                                )[0].name
+                              }
                             />
                           ))}
                         </Box>

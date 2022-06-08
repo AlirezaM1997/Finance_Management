@@ -30,13 +30,15 @@ const ME_QUERY = gql`
   query Query {
     me {
       username
+      img
     }
   }
 `;
 
 interface IUser {
-  me: { username: string };
+  me: { username: string; img: File };
 }
+
 const Dashboard: FC | any = () => {
   const drawerWidth: number = 240;
 
@@ -88,12 +90,12 @@ const Dashboard: FC | any = () => {
     },
   }));
 
-  const mdTheme = createTheme();
-
   const [open, setOpen] = useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
   };
+
+  const mdTheme = createTheme();
 
   const [info, setInfo] = useState<IUser>();
   const { error, loading, data } = useQuery(ME_QUERY, {
@@ -124,9 +126,10 @@ const Dashboard: FC | any = () => {
             <Toolbar
               sx={{
                 pr: "24px", // keep right padding when drawer closed
+                // position:'fixed'
               }}
             >
-              <IconButton
+              {/* <IconButton
                 edge="start"
                 color="inherit"
                 aria-label="open drawer"
@@ -137,7 +140,7 @@ const Dashboard: FC | any = () => {
                 }}
               >
                 <MenuIcon />
-              </IconButton>
+              </IconButton> */}
               <Typography
                 component="h1"
                 variant="h6"
@@ -152,14 +155,24 @@ const Dashboard: FC | any = () => {
                   <NotificationsIcon />
                 </Badge>
               </IconButton>
-              <Typography
-                component="h6"
-                variant="h6"
-                noWrap
-                ml='1rem'
-              >
+              <Typography component="h6" variant="h6" noWrap ml="1rem">
                 {info?.me.username}
               </Typography>
+              {info?.me.img ? (
+                <Box
+                  component="img"
+                  sx={{
+                    height: 40,
+                    width: 40,
+                    maxHeight: { xs: 40, md: 40 },
+                    maxWidth: { xs: 35, md: 35 },
+                    borderRadius: "50%",
+                    mx: "10px",
+                  }}
+                  alt="avatar"
+                  src={`http://localhost:80/${info?.me.img}`}
+                />
+              ) : null}
             </Toolbar>
           </AppBar>
           <Drawer
@@ -175,13 +188,34 @@ const Dashboard: FC | any = () => {
               sx={{
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "flex-end",
+                justifyContent: "center",
                 px: [1],
               }}
             >
-              <IconButton onClick={toggleDrawer}>
+              <Typography
+                variant="h4"
+                my={3}
+                fontFamily="system-ui"
+                fontWeight="600"
+                align="center"
+                component="div"
+                color="gray"
+              >
+                Finance
+                <Typography
+                  variant="h6"
+                  fontFamily="system-ui"
+                  fontWeight="600"
+                  align="center"
+                  component="div"
+                  color="gray"
+                >
+                  Management
+                </Typography>
+              </Typography>
+              {/* <IconButton onClick={toggleDrawer}>
                 <ChevronLeftIcon />
-              </IconButton>
+              </IconButton> */}
             </Toolbar>
             <Divider />
             <List component="nav">
@@ -189,7 +223,6 @@ const Dashboard: FC | any = () => {
               <Divider sx={{ my: 1 }} />
               <SecondaryListItems />
             </List>
-            {/* {window.location.pathname === '/dashboard'?<h2>jjjjjjjjjjjjj</h2>:''} */}
           </Drawer>
           {/* <Box
             component="main"
