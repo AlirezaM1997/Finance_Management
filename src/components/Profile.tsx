@@ -41,16 +41,6 @@ interface IUser {
   me: { username: string; name: string; img: File };
 }
 
-interface IFile {
-  File: {
-    lastModified: number;
-    lastModifiedDate: string;
-    name: string;
-    size: number;
-    type: string;
-    webkitRelativePath: string;
-  };
-}
 //React.ChangeEvent<HTMLInputElement>
 
 const Profile: FC | any = () => {

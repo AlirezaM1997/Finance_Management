@@ -41,28 +41,7 @@ import { DoneOutline, FiberNew } from "@mui/icons-material";
 
 //components
 import Title from "./Title";
-
-const parsIsoDate = (date: string) => {
-  const months = [
-    "Janury",
-    "Februry",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-  const a = new Date(date);
-  const year = a.getFullYear();
-  const month = a.getMonth();
-  const day = a.getDay();
-  return `${months[month - 1]} ${day} ,${year}`;
-};
+import { useAllState } from "../Provider";
 
 ////////////Select Input//////////////
 const ITEM_HEIGHT = 48;
@@ -149,6 +128,7 @@ const Expenses = () => {
 
   ///////////Date//////////////////
   const [date, setDate] = React.useState<Date | null>(null);
+  const { parsIsoDate } = useAllState();
 
   /////////Leaflet//////////
   const [initialPosition, setInitialPosition] = useState<[number, number]>([
@@ -296,9 +276,14 @@ const Expenses = () => {
 
   return (
     <>
-      <Box  pr="10px" pt="80px" width="100%" sx={{
+      <Box
+        pr="10px"
+        pt="80px"
+        width="100%"
+        sx={{
           pl: { xs: "80px", md: "250px" },
-        }}>
+        }}
+      >
         <Typography
           variant="h4"
           gutterBottom

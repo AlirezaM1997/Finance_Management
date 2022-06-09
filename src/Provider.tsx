@@ -1,13 +1,19 @@
-import React, { FC, useState } from "react";
+import React, { FC, ProviderProps, useState } from "react";
+
+type voidFunc = (a: string) => string;
 
 interface IThemeContext {
   token: string;
   setToken: (a: string) => void;
+  parsIsoDate: voidFunc;
 }
 
 const defaultState = {
   token: "",
   setToken: () => {
+    throw new Error("context out of range");
+  },
+  parsIsoDate: () => {
     throw new Error("context out of range");
   },
 };
@@ -16,11 +22,33 @@ const Context = React.createContext<IThemeContext>(defaultState);
 
 const Provider = ({ children }: any) => {
   const [token, setToken] = useState("");
+  const parsIsoDate: voidFunc = function (date: string) {
+    const months = [
+      "Janury",
+      "Februry",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    const a = new Date(date);
+    const year = a.getFullYear();
+    const month = a.getMonth();
+    const day = a.getDay();
+    return `${months[month - 1]} ${day} ,${year}`;
+  };
   return (
     <Context.Provider
       value={{
         token,
         setToken,
+        parsIsoDate,
       }}
     >
       {children}

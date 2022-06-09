@@ -39,6 +39,12 @@ const ColorButton = styled(Button)<ButtonProps>(({ theme }) => ({
 }));
 ////////////////////////////////
 
+interface ITag {
+  getMyTags: [{ name: string; _id: number; color: string }];
+}
+
+///////////////////////////////
+
 const GET_TAGS_QUERY = gql`
   query Query {
     getMyTags {
@@ -67,10 +73,10 @@ const EDIT_TAG_MUTATION = gql`
 `;
 
 function CreateTags() {
-  const [allTags, setAllTags] = React.useState<any | null>(null);
+  const [allTags, setAllTags] = React.useState<ITag|null>(null);
   const [color, setColor] = useState("#6B6B6B");
   const [tag, setTag] = useState("");
-  console.log(tag);
+
   const [send_muation] = useMutation(ADD_TAG_MUTATION);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -104,17 +110,14 @@ function CreateTags() {
   const [currentTagIDForEdit, setCurrentTagIDForEdit] = useState<number | null>(
     null
   );
-  // const [editedTagName, setEditedTagName] = useState<string | null>(null);
-  // const [editedTagColor, setEditedTagColor] = useState<
-  //   string | number | undefined
-  // >();
+
   const [editedTagName, setEditedTagName] = useState(
     allTags?.getMyTags.filter(
       (i: { name: string; _id: number; color: string }) =>
         i._id === currentTagIDForEdit
     )[0]?.name
   );
-  const [editedTagColor, setEditedTagColor] = useState<string>(
+  const [editedTagColor, setEditedTagColor] = useState<string|undefined>(
     allTags?.getMyTags.filter(
       (i: { name: string; _id: number; color: string }) =>
         i._id === currentTagIDForEdit
@@ -139,13 +142,13 @@ function CreateTags() {
           data: {
             name: editedTagName
               ? editedTagName
-              : allTags.getMyTags.filter(
+              : allTags?.getMyTags.filter(
                   (i: { name: string; _id: number; color: string }) =>
                     i._id === currentTagIDForEdit
                 )[0].name,
             color: editedTagColor
               ? editedTagColor
-              : allTags.getMyTags.filter(
+              : allTags?.getMyTags.filter(
                   (i: { name: string; _id: number; color: string }) =>
                     i._id === currentTagIDForEdit
                 )[0].color,
@@ -248,7 +251,6 @@ function CreateTags() {
                 borderRadius: "0.3rem",
                 borderBottom: "none",
               }}
-              // defaultValue="gray"
               value={color}
               onChange={(e) => setColor(e)}
               autoComplete="off"

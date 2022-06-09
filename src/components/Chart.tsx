@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -8,12 +8,20 @@ import {
   Title,
   Tooltip,
   Legend,
-} from 'chart.js';
-import { Line } from 'react-chartjs-2';
-import { Box } from '@mui/system';
-import { CircularProgress } from '@material-ui/core';
-import { useQuery,gql } from '@apollo/client';
+} from "chart.js";
+import { Line } from "react-chartjs-2";
+import { Box } from "@mui/system";
+import { CircularProgress } from "@material-ui/core";
+import { useQuery, gql } from "@apollo/client";
+import { useAllState } from "../Provider";
 
+type MyExpenses = {
+  amount: number;
+  date: string;
+  tags: { _id: number; color: string; name: string };
+  geo: { lat: number; lon: number };
+  _id: number;
+};
 
 const MAIN_QUERY = gql`
   query Query {
@@ -49,38 +57,40 @@ ChartJS.register(
   Legend
 );
 
- const options = {
+const options = {
   responsive: true,
   plugins: {
     legend: {
-      position: 'top' as const,
+      position: "top" as const,
     },
     title: {
       display: true,
-      text: 'Chart.js Line Chart',
+      text: "Chart.js Line Chart",
     },
   },
 };
 
-const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
-
- const data = {
-  labels,
-  datasets: [
-    {
-      label: 'Dataset 1',
-      // data: labels.map(() => faker.datatype.number({ min: -1000, max: 1000 })),
-      borderColor: 'rgb(255, 99, 132)',
-      backgroundColor: 'rgba(255, 99, 132, 0.5)',
-    },
-  ],
-};
-
 export default function Chart() {
-
   const [allData, setAllData] = React.useState<any | null>(null);
+  const { parsIsoDate } = useAllState();
 
-  const { error, loading, data, refetch } = useQuery(MAIN_QUERY);
+  const labels = allData?.getMyExpenses.map((i: MyExpenses) =>
+    parsIsoDate(i.date)
+  );
+
+  const _data = {
+    labels,
+    datasets: [
+      {
+        label: "Dataset 1",
+        data: allData?.getMyExpenses.map((i: MyExpenses) => i.amount),
+        borderColor: "rgb(255, 99, 132)",
+        backgroundColor: "rgba(255, 99, 132, 0.5)",
+      },
+    ],
+  };
+
+  const { error, loading, data } = useQuery(MAIN_QUERY);
 
   useEffect(() => {
     setAllData(data);
@@ -101,8 +111,11 @@ export default function Chart() {
       </Box>
     );
   if (error) return <p>Error :(</p>;
-    console.log(allData);
-    
+  console.log(allData);
 
-  return <Line options={options} data={data} />;
+  return (
+    <>
+      <Line options={options} data={_data} />
+    </>
+  );
 }
