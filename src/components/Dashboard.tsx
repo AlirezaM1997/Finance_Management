@@ -1,7 +1,8 @@
-import React, { useState, useRef, useEffect, FC } from "react";
+import React, { useState, useEffect, FC } from "react";
 import { gql, useQuery } from "@apollo/client";
+import { Outlet, Link } from "react-router-dom";
 
-// import * as React from 'react';
+//mui
 import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import MuiDrawer from "@mui/material/Drawer";
@@ -13,32 +14,66 @@ import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import Badge from "@mui/material/Badge";
-import Container from "@mui/material/Container";
-import Grid from "@mui/material/Grid";
-import Paper from "@mui/material/Paper";
-
-import MenuIcon from "@mui/icons-material/Menu";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import { MainListItems, SecondaryListItems } from "./SideMenu";
-import Deposits from "./Deposits";
 import CircularProgress from "@mui/material/CircularProgress";
-import { Outlet, Link } from "react-router-dom";
 
-const ME_QUERY = gql`
+//chart
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Pie } from "react-chartjs-2";
+import { ArrowRight } from "@mui/icons-material";
+
+const MAIN_QUERY = gql`
   query Query {
     me {
       name
       img
     }
+    getMyExpenses {
+      _id
+      amount
+      tags {
+        _id
+        name
+        color
+      }
+      geo {
+        lat
+        lon
+      }
+      date
+    }
+    getMyTags {
+      _id
+      name
+      color
+    }
   }
 `;
 
-interface IUser {
+interface IData {
   me: { name: string; img: File };
+  getMyExpenses: [
+    {
+      amount: number;
+      date: string;
+      tags: { _id: number; color: string; name: string };
+      geo: { lat: number; lon: number };
+      _id: number;
+    }
+  ];
+  getMyTags: [
+    {
+      _id: number;
+      color: string;
+      name: string;
+    }
+  ];
 }
 
-const Dashboard: FC | any = () => {
+const Dashboard: FC = () => {
+  const [info, setInfo] = useState<IData>();
+
   const drawerWidth: number = 240;
 
   interface AppBarProps extends MuiAppBarProps {
@@ -89,13 +124,27 @@ const Dashboard: FC | any = () => {
     },
   }));
 
-  const [open, setOpen] = useState(true);
+  ChartJS.register(ArcElement, Tooltip, Legend);
 
+  const _data = {
+    labels: info?.getMyTags.map((i) => i.name),
+    datasets: [
+      {
+        label: "# of Votes",
+        data: [12, 19, 3, 5, 2, 3],
+        backgroundColor: info?.getMyTags.map((i) => i.color),
+      },
+    ],
+  };
+
+  const arr: any[] = [];
+  const _arr = info?.getMyExpenses.filter((i) => arr.concat(i.tags));
+  console.log(_arr);
+
+  const [open, setOpen] = useState(true);
   const [width, setWidth] = useState(window.innerWidth);
 
   useEffect(() => {
-    console.log(open);
-    
     const updateWindowDimensions = () => {
       const newHeight = window.innerWidth;
       setWidth(newHeight);
@@ -110,12 +159,16 @@ const Dashboard: FC | any = () => {
 
   const mdTheme = createTheme();
 
-  const [info, setInfo] = useState<IUser>();
-  const { error, loading, data } = useQuery(ME_QUERY, {
+  const { error, loading, data } = useQuery(MAIN_QUERY, {
     onCompleted: setInfo,
   });
 
-  if (error) return <p>Dashboard : You are not login!!!</p>;
+  if (error)
+    return (
+      <h3 style={{ textAlign: "center" }}>
+        From Dashboard : You are not login!
+      </h3>
+    );
   if (loading)
     return (
       <Box
@@ -129,6 +182,7 @@ const Dashboard: FC | any = () => {
         <CircularProgress />
       </Box>
     );
+  console.log(info);
 
   return (
     <>
@@ -190,15 +244,15 @@ const Dashboard: FC | any = () => {
             height: "100%",
           }}
         >
-            <Toolbar
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                px: [1],
-              }}
-              >
-              {open ? (
+          <Toolbar
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              px: [1],
+            }}
+          >
+            {open ? (
               <Typography
                 variant="h4"
                 my={3}
@@ -220,8 +274,8 @@ const Dashboard: FC | any = () => {
                   Management
                 </Typography>
               </Typography>
-          ) : null}
-            </Toolbar>
+            ) : null}
+          </Toolbar>
           <Divider />
           <List component="nav">
             <MainListItems />
@@ -229,6 +283,38 @@ const Dashboard: FC | any = () => {
             <SecondaryListItems />
           </List>
         </Drawer>
+        {location.href === "/dashboard" ? (
+          <Box
+            pr="10px"
+            pt="80px"
+            width="100%"
+            sx={{
+              pl: { xs: "80px", md: "250px" },
+            }}
+          >
+            <Typography
+              variant="h4"
+              gutterBottom
+              fontFamily="system-ui"
+              fontWeight="600"
+              pb={2}
+              sx={{
+                textAlign: { xs: "center", md: "left" },
+              }}
+              component="div"
+            >
+              <ArrowRight
+                sx={{
+                  display: { xs: "none", md: "inline" },
+                }}
+              />
+              Overview
+            </Typography>
+            <Box sx={{ p: "2.5rem" }}>
+              <Pie data={_data} />
+            </Box>
+          </Box>
+        ) : null}
       </ThemeProvider>
       <Outlet />
     </>

@@ -16,6 +16,7 @@ import Backdrop from "@mui/material/Backdrop";
 import { styled } from "@mui/material/styles";
 import { ButtonProps } from "@mui/material/Button";
 import { purple } from "@mui/material/colors";
+import { ArrowRight } from "@mui/icons-material";
 
 /////////////Modal////////////////////
 const style = {
@@ -73,7 +74,7 @@ const EDIT_TAG_MUTATION = gql`
 `;
 
 function CreateTags() {
-  const [allTags, setAllTags] = React.useState<ITag|null>(null);
+  const [allTags, setAllTags] = React.useState<ITag | null>(null);
   const [color, setColor] = useState("#6B6B6B");
   const [tag, setTag] = useState("");
 
@@ -81,7 +82,6 @@ function CreateTags() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // const data = new FormData(event.currentTarget);
 
     try {
       const {
@@ -97,6 +97,11 @@ function CreateTags() {
         },
       });
       console.log(status);
+      if (status === 200) {
+        setTag("");
+        setColor("#6B6B6B");
+        refetch();
+      }
     } catch (error) {
       console.log(error);
     }
@@ -117,16 +122,16 @@ function CreateTags() {
         i._id === currentTagIDForEdit
     )[0]?.name
   );
-  const [editedTagColor, setEditedTagColor] = useState<string|undefined>(
+  const [editedTagColor, setEditedTagColor] = useState<string | undefined>(
     allTags?.getMyTags.filter(
       (i: { name: string; _id: number; color: string }) =>
         i._id === currentTagIDForEdit
     )[0]?.color
   );
 
-  console.log("editedTagName", editedTagName);
-  console.log("editedTagColor", editedTagColor);
-  console.log("allTags", allTags);
+  // console.log("editedTagName", editedTagName);
+  // console.log("editedTagColor", editedTagColor);
+  // console.log("allTags", allTags);
 
   const [edit_muation] = useMutation(EDIT_TAG_MUTATION);
 
@@ -170,7 +175,7 @@ function CreateTags() {
 
   useEffect(() => {
     setAllTags(data);
-    console.log(data);
+    // console.log(data);
   }, [data]);
 
   if (loading)
@@ -187,7 +192,6 @@ function CreateTags() {
       </Box>
     );
   if (error) return <p>Error :(</p>;
-  console.log(allTags);
 
   return (
     <>
@@ -196,6 +200,7 @@ function CreateTags() {
         onSubmit={handleSubmit}
         pr="10px"
         pt="80px"
+        pb="50px"
         width="100%"
         display="flex"
         flexDirection="column"
@@ -216,7 +221,12 @@ function CreateTags() {
           }}
           component="div"
         >
-         #Tags
+          <ArrowRight
+            sx={{
+              display: { xs: "none", md: "inline" },
+            }}
+          />
+          Tags
         </Typography>
         <Box
           display="flex"

@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import Chart from "./Chart";
+import { ArrowRight } from "@mui/icons-material";
 
 function Reports() {
   return (
@@ -28,6 +29,11 @@ function Reports() {
             textAlign: { xs: "center", md: "left" },
           }}
         >
+          <ArrowRight
+            sx={{
+              display: { xs: "none", md: "inline" },
+            }}
+          />
           Reports
         </Typography>
 

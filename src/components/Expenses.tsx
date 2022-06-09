@@ -37,7 +37,7 @@ import { Icon, Map } from "leaflet";
 import markerIconPng from "leaflet/dist/images/marker-icon.png";
 
 //icon
-import { DoneOutline, FiberNew } from "@mui/icons-material";
+import { ArrowRight, DoneOutline, FiberNew } from "@mui/icons-material";
 
 //components
 import Title from "./Title";
@@ -172,7 +172,6 @@ const Expenses = () => {
   ////////Select Input////////////
   const theme = useTheme();
   const [tags, setTags] = React.useState<string[]>([]);
-  const [_tags, _setTags] = React.useState<number[]>([]);
 
   const handleChange = (event: SelectChangeEvent<typeof tags>) => {
     const {
@@ -215,10 +214,9 @@ const Expenses = () => {
         },
       });
       if (status === 200) {
-        // setTags([]);
-        // setDate(null);
-        // data.set("amount", "");
         refetch();
+        setTags([])
+        setDate(null)
         handleClose();
       }
       console.log(status);
@@ -296,6 +294,11 @@ const Expenses = () => {
           }}
           component="div"
         >
+          <ArrowRight
+            sx={{
+              display: { xs: "none", md: "inline" },
+            }}
+          />
           Expenses
         </Typography>
         <Box display="flex" justifyContent="space-between" mb="15px">
@@ -329,7 +332,7 @@ const Expenses = () => {
               }) => (
                 <TableRow key={row._id}>
                   <TableCell>{parsIsoDate(row.date)}</TableCell>
-                  <TableCell>{row.amount}</TableCell>
+                  <TableCell>{row.amount} $</TableCell>
                   <TableCell>{row.place}</TableCell>
                   <TableCell>
                     {row.tags.map(
@@ -403,7 +406,7 @@ const Expenses = () => {
                     required
                     fullWidth
                     id="amount"
-                    label="Amount"
+                    label="Amount($)"
                     name="amount"
                     autoComplete="amount"
                     type="number"

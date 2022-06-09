@@ -22,7 +22,7 @@ const Context = React.createContext<IThemeContext>(defaultState);
 
 const Provider = ({ children }: any) => {
   const [token, setToken] = useState("");
-  const parsIsoDate: voidFunc = function (date: string) {
+  const parsIsoDate: voidFunc =  (date: string)=> {
     const months = [
       "Janury",
       "Februry",
@@ -41,8 +41,9 @@ const Provider = ({ children }: any) => {
     const year = a.getFullYear();
     const month = a.getMonth();
     const day = a.getDay();
-    return `${months[month - 1]} ${day} ,${year}`;
+    return `${months[month]} ${day} ,${year}`;
   };
+
   return (
     <Context.Provider
       value={{

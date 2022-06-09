@@ -12,6 +12,7 @@ import {
   AccountBox,
   AccountBoxOutlined,
   AccountBoxRounded,
+  ArrowRight,
   Face,
 } from "@mui/icons-material";
 
@@ -158,6 +159,11 @@ const Profile: FC | any = () => {
             }}
             component="div"
           >
+            <ArrowRight
+            sx={{
+              display: { xs: "none", md: "inline" },
+            }}
+          />
             Profile Setting
           </Typography>
           <Stack
