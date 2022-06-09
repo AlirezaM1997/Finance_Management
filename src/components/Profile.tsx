@@ -8,7 +8,12 @@ import Stack from "@mui/material/Stack";
 
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { CircularProgress, TextField } from "@material-ui/core";
-import { AccountBox, AccountBoxOutlined, AccountBoxRounded, Face } from "@mui/icons-material";
+import {
+  AccountBox,
+  AccountBoxOutlined,
+  AccountBoxRounded,
+  Face,
+} from "@mui/icons-material";
 
 const Input = styled("input")({
   display: "none",
@@ -53,10 +58,37 @@ const Profile: FC | any = () => {
   const [name, setName] = useState<string | null | undefined>(null);
   const [img, setImg] = useState<File | null | undefined>(null);
 
+  const [file, setFile] = useState(null);
+  const [fileDataURL, setFileDataURL] = useState(null);
+
   const handleUploadImg = (e: any) => {
+    const file = e.target.files[0];
+    setFile(file);
+
     setImg(e.target.files[0]);
     console.log(e.target.files[0]);
   };
+
+  useEffect(() => {
+    let fileReader: any = false;
+    let isCancel: any = false;
+    if (file) {
+      fileReader = new FileReader();
+      fileReader.onload = (e: any) => {
+        const { result } = e.target;
+        if (result && !isCancel) {
+          setFileDataURL(result);
+        }
+      };
+      fileReader.readAsDataURL(file);
+    }
+    return () => {
+      isCancel = true;
+      if (fileReader && fileReader.readyState === 1) {
+        fileReader.abort();
+      }
+    };
+  }, [file]);
 
   const [edit_muation] = useMutation(EDIT_INFO_MUTATION);
 
@@ -72,7 +104,7 @@ const Profile: FC | any = () => {
       } = await edit_muation({
         variables: {
           name: name ? name : info?.me.name,
-          img: img ? img : info?.me.img,
+          img: img,
         },
       });
       console.log(status);
@@ -114,22 +146,26 @@ const Profile: FC | any = () => {
     return (
       <>
         <Box
-          pl="250px"
           pr="10px"
           pt="80px"
           width="100%"
           display="flex"
           flexDirection="column"
           justifyContent="center"
+          sx={{
+            pl: { xs: "80px", md: "250px" },
+          }}
         >
           <Typography
             variant="h4"
             gutterBottom
-            fontFamily="monospace"
+            fontFamily="system-ui"
             fontWeight="600"
             borderBottom="dotted 1px #1976d2"
             pb={2}
-            align="center"
+            sx={{
+              textAlign: { xs: "center", md: "left" },
+            }}
             component="div"
           >
             Profile Setting
@@ -142,14 +178,27 @@ const Profile: FC | any = () => {
             mt={4}
           >
             <Stack direction="column" alignItems="center" spacing={1}>
-              {info.me.img ? (
+              {fileDataURL ? (
                 <Box
                   component="img"
                   sx={{
                     height: 200,
                     width: 200,
                     maxHeight: { xs: 200, md: 200 },
-                    maxWidth: { xs: 350, md: 250 },
+                    maxWidth: { xs: 250, md: 250 },
+                    borderRadius: "50%",
+                  }}
+                  alt="avatar preview"
+                  src={fileDataURL}
+                />
+              ) : info.me.img ? (
+                <Box
+                  component="img"
+                  sx={{
+                    height: 200,
+                    width: 200,
+                    maxHeight: { xs: 200, md: 200 },
+                    maxWidth: { xs: 250, md: 250 },
                     borderRadius: "50%",
                   }}
                   alt="avatar"

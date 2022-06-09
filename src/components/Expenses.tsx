@@ -204,15 +204,6 @@ const Expenses = () => {
     console.log("tags:", tags);
   };
 
-  // useEffect(() => {
-  //   const arr = allData?.getMyTags.filter(
-  //     (i: any, j: number) => i.name === tags[j]
-  //   );
-  //   console.log("arr:", arr);
-
-  //   _setTags(arr?.map((i: any) => i._id));
-  // }, [tags]);
-
   useEffect(() => {
     console.log("tags", tags);
   }, [tags]);
@@ -251,8 +242,6 @@ const Expenses = () => {
         handleClose();
       }
       console.log(status);
-
-      // navToDashboard("/dashboard");
     } catch (error) {
       console.log(error);
     }
@@ -307,15 +296,19 @@ const Expenses = () => {
 
   return (
     <>
-      <Box pl="250px" pr="10px" pt="80px" width="100%">
+      <Box  pr="10px" pt="80px" width="100%" sx={{
+          pl: { xs: "80px", md: "250px" },
+        }}>
         <Typography
           variant="h4"
           gutterBottom
-          fontFamily="monospace"
+          fontFamily="system-ui"
           fontWeight="600"
           borderBottom="dotted 1px #1976d2"
           pb={2}
-          align="center"
+          sx={{
+            textAlign: { xs: "center", md: "left" },
+          }}
           component="div"
         >
           Expenses

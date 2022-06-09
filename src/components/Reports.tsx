@@ -6,28 +6,32 @@ function Reports() {
   return (
     <>
       <Box
-        pl="250px"
         pr="10px"
         pt="80px"
         width="100%"
         display="flex"
         flexDirection="column"
         justifyContent="center"
+        sx={{
+          pl: { xs: "80px", md: "250px" },
+        }}
       >
         <Typography
           variant="h4"
           gutterBottom
-          fontFamily="monospace"
+          fontFamily="system-ui"
           fontWeight="600"
           borderBottom="dotted 1px #1976d2"
-
           pb={2}
-          align="center"
           component="div"
+          sx={{
+            textAlign: { xs: "center", md: "left" },
+          }}
         >
           Reports
         </Typography>
-        <Chart/>
+
+        <Chart />
       </Box>
     </>
   );
