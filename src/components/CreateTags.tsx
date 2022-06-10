@@ -272,7 +272,7 @@ function CreateTags() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Submit
+              Add
             </Button>
           </Box>
         </Box>

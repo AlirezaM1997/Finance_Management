@@ -6,6 +6,8 @@ interface IThemeContext {
   token: string;
   setToken: (a: string) => void;
   parsIsoDate: voidFunc;
+  mode:string;
+  setMode: (a: 'light' | 'dark') => void;
 }
 
 const defaultState = {
@@ -16,11 +18,16 @@ const defaultState = {
   parsIsoDate: () => {
     throw new Error("context out of range");
   },
+  mode:'light',
+  setMode :() => {
+    throw new Error("context out of range");
+  },
 };
 
 const Context = React.createContext<IThemeContext>(defaultState);
 
 const Provider = ({ children }: any) => {
+  const [mode, setMode] = useState<'light' | 'dark'>('light');
   const [token, setToken] = useState("");
   const parsIsoDate: voidFunc =  (date: string)=> {
     const months = [
@@ -47,6 +54,8 @@ const Provider = ({ children }: any) => {
   return (
     <Context.Provider
       value={{
+        mode,
+        setMode,
         token,
         setToken,
         parsIsoDate,

@@ -17,6 +17,7 @@ import Expenses from "./components/Expenses";
 import Reports from "./components/Reports";
 import CreateTags from "./components/CreateTags";
 import Profile from "./components/Profile";
+import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -26,44 +27,59 @@ const App = () => {
   const { setToken } = useAllState();
   const { token } = useAllState();
 
+  const { mode } = useAllState();
+  const mdTheme = createTheme();
+
+  const darkTheme = createTheme({
+    palette: {
+      mode: "dark",
+    },
+  });
+
+  const currentMode = mode === "dark" ? darkTheme : mdTheme;
+
   useEffect(() => {
     const cookies = new Cookies();
     const token = cookies.get("token");
     setToken(token);
   }, []);
-  // console.log("%c token in route :", "background: #222; color: #bada55", token);
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<SignIn />}></Route>
-        <Route path="/signup" element={<SignUp />}></Route>
-        <Route
-          path="/dashboard"
-          element={
-            token ? (
-              <Dashboard />
-            ) : (
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  marginTop: "2rem",
-                }}
-              >
-                <CircularProgress />
-              </Box>
-            )
-          }
-        >
-          <Route path="/dashboard/expenses" element={<Expenses />}></Route>
-          <Route path="/dashboard/createtags" element={<CreateTags />}></Route>
-          <Route path="/dashboard/reports" element={<Reports />}></Route>
-          <Route path="/dashboard/profile" element={<Profile/>}></Route>
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <ThemeProvider theme={currentMode}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<SignIn />}></Route>
+          <Route path="/signup" element={<SignUp />}></Route>
+          <Route
+            path="/dashboard"
+            element={
+              token ? (
+                <Dashboard />
+              ) : (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginTop: "2rem",
+                  }}
+                >
+                  <CircularProgress />
+                </Box>
+              )
+            }
+          >
+            <Route path="/dashboard/expenses" element={<Expenses />}></Route>
+            <Route
+              path="/dashboard/createtags"
+              element={<CreateTags />}
+            ></Route>
+            <Route path="/dashboard/reports" element={<Reports />}></Route>
+            <Route path="/dashboard/profile" element={<Profile />}></Route>
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 };
 

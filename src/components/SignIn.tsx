@@ -1,11 +1,17 @@
 import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { gql, useMutation } from "@apollo/client";
+import Cookies from "universal-cookie";
+import { useAllState } from "../Provider";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+//mui
 import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
-// import Link from '@mui/material/Link';
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
@@ -14,11 +20,6 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { LoadingButton } from "@mui/lab";
 import SaveIcon from "@mui/icons-material/Save";
-
-import { Link, useNavigate } from "react-router-dom";
-import { gql, useMutation } from "@apollo/client";
-import Cookies from "universal-cookie";
-import { useAllState } from "../Provider";
 
 const LOGIN_MUTATION = gql`
   mutation Mutation($username: String!, $password: String!) {
@@ -53,18 +54,17 @@ export default function SignIn() {
           password: data.get("password"),
         },
       });
-      cookies.set("token", token);
-      setToken(token);
-      // console.log(
-      //   "%c token in login from cookie :",
-      //   "background: red; color: black",
-      //   token
-      // );
-
-      setLoading(false);
-      navToDashboard("/dashboard");
+      if (token) {
+        cookies.set("token", token);
+        setToken(token);
+        toast.success("You have successfully logged in!");
+        setTimeout(() => navToDashboard("/dashboard"), 3000);
+      }
+      console.log(token);
     } catch (error) {
+      toast.error("The username or password you entered is incorrect");
       console.log(error);
+      setLoading(false);
     }
   };
 
@@ -115,10 +115,10 @@ export default function SignIn() {
               loading={loading}
               loadingPosition="start"
               startIcon={loading ? <SaveIcon /> : null}
-              variant='contained'
+              variant="contained"
               fullWidth
               sx={{ mt: 2, mb: 1 }}
-              type='submit'
+              type="submit"
             >
               Sign In
             </LoadingButton>
@@ -131,12 +131,12 @@ export default function SignIn() {
                 <Link style={{ color: "red" }} to={"/signup"}>
                   {" Sign Up"}
                 </Link>
-               
               </Grid>
             </Grid>
           </Box>
         </Box>
       </Container>
+      <ToastContainer  pauseOnHover={false} toastStyle={{background : 'white', color:'black'}}/>
     </ThemeProvider>
   );
 }

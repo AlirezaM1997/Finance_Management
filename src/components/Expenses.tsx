@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, FC, RefAttributes } from "react";
+import React, { useState, useEffect } from "react";
 import { gql, useMutation, useQuery } from "@apollo/client";
 
 //mui
@@ -10,12 +10,10 @@ import TableRow from "@mui/material/TableRow";
 import {
   Box,
   Button,
-  Checkbox,
   Chip,
   FormControl,
   Grid,
   InputLabel,
-  ListItemText,
   TextField,
   Typography,
 } from "@mui/material";
@@ -31,6 +29,7 @@ import OutlinedInput from "@mui/material/OutlinedInput";
 import { CircularProgress } from "@material-ui/core";
 import { Theme, useTheme } from "@mui/material/styles";
 
+//leaflet
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { Icon, Map } from "leaflet";
@@ -63,7 +62,6 @@ function getStyles(name: string, tags: readonly string[], theme: Theme) {
         : theme.typography.fontWeightMedium,
   };
 }
-///////////////////////////////////////
 
 /////////////Modal////////////////////
 const style = {
@@ -77,8 +75,8 @@ const style = {
   p: 4,
   borderRadius: 1,
 };
-////////////////////////////////
 
+/////////////Query//////////////
 const MAIN_QUERY = gql`
   query Query {
     getMyExpenses {
@@ -135,7 +133,7 @@ const Expenses = () => {
     0, 0,
   ]);
   const [selectedPosition, setSelectedPosition] = useState<[number, number]>([
-    51.505, -0.09,
+    35.7219, 51.3347,
   ]);
 
   useEffect(() => {
@@ -144,7 +142,6 @@ const Expenses = () => {
       setInitialPosition([latitude, longitude]);
     });
   }, []);
-  // console.log(selectedPosition);
 
   const Markers = () => {
     const map = useMapEvents({
@@ -152,7 +149,6 @@ const Expenses = () => {
         setSelectedPosition([e.latlng.lat, e.latlng.lng]);
       },
     });
-
     return selectedPosition ? (
       <Marker
         key={selectedPosition[0]}
@@ -177,10 +173,7 @@ const Expenses = () => {
     const {
       target: { value },
     } = event;
-
     setTags(typeof value === "string" ? value.split(",") : value);
-
-    console.log("tags:", tags);
   };
 
   useEffect(() => {
@@ -241,7 +234,6 @@ const Expenses = () => {
       if (status === 200) refetch();
 
       console.log(status);
-      console.log(allData);
     } catch (error) {
       console.log(error);
     }
@@ -253,7 +245,6 @@ const Expenses = () => {
 
   useEffect(() => {
     setAllData(data);
-    console.log(allData);
   }, [data]);
 
   if (loading)
@@ -270,7 +261,6 @@ const Expenses = () => {
       </Box>
     );
   if (error) return <p>Error :(</p>;
-  console.log(allData);
 
   return (
     <>
@@ -419,7 +409,6 @@ const Expenses = () => {
                     <DatePicker
                       label="Select Date"
                       value={date}
-                      // style={{ width: "100%" }}
                       onChange={(newValue) => {
                         setDate(newValue);
                       }}
@@ -490,10 +479,8 @@ const Expenses = () => {
                 <MapContainer
                   // center={[51.505, -0.09]}
                   center={selectedPosition || initialPosition}
-                  // whenCreated={setMap}
-                  zoom={16}
+                  zoom={14}
                   scrollWheelZoom={false}
-                  // ref={mapRef}
                   style={{
                     width: "400px",
                     height: "100%",

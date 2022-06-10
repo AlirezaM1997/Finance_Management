@@ -1,21 +1,22 @@
 import * as React from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Link, useNavigate } from "react-router-dom";
+import { useAllState } from "../Provider";
+import { gql, useMutation } from "@apollo/client";
+import Cookies from "universal-cookie";
+
+//mui
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-
-import { Link, useNavigate } from "react-router-dom";
-import { gql, useMutation } from "@apollo/client";
-import Cookies from "universal-cookie";
 import { AccountCircle } from "@mui/icons-material";
-import { useAllState } from "../Provider";
 
 const REGISTER_MUTATION = gql`
   mutation Mutation($name: String!, $username: String!, $password: String!) {
@@ -47,9 +48,12 @@ export default function SignUp() {
           password: data.get("password"),
         },
       });
-      cookies.set("token", token);
-      setToken(token);
-      navToDashboard("/dashboard");
+      if (token) {
+        cookies.set("token", token);
+        setToken(token);
+        toast.success("You have successfully registered!");
+        setTimeout(() => navToDashboard("/dashboard"), 3000);
+      }
 
     } catch (error) {
       console.log(error);
@@ -119,6 +123,7 @@ export default function SignUp() {
           </Box>
         </Box>
       </Container>
+      <ToastContainer  pauseOnHover={false} toastStyle={{background : 'white', color:'black'}}/>
     </ThemeProvider>
   );
 }

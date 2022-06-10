@@ -1,6 +1,7 @@
 import React, { useState, useEffect, FC } from "react";
 import { gql, useQuery } from "@apollo/client";
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, Link, useLocation } from "react-router-dom";
+import { useAllState } from "../Provider";
 
 //mui
 import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
@@ -17,11 +18,47 @@ import Badge from "@mui/material/Badge";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import { MainListItems, SecondaryListItems } from "./SideMenu";
 import CircularProgress from "@mui/material/CircularProgress";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
+import { ArrowRight } from "@mui/icons-material";
 
 //chart
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
-import { ArrowRight } from "@mui/icons-material";
+
+const drawerWidth: number = 240;
+
+interface AppBarProps extends MuiAppBarProps {
+  open?: boolean;
+}
+
+const AppBar = styled(MuiAppBar, {
+  shouldForwardProp: (prop) => prop !== "open",
+})<AppBarProps>(({ theme, open }) => ({
+  zIndex: theme.zIndex.drawer + 1,
+  ...(open && {
+    marginLeft: drawerWidth,
+    width: `calc(100% - ${drawerWidth}px)`,
+  }),
+}));
+
+const Drawer = styled(MuiDrawer, {
+  shouldForwardProp: (prop) => prop !== "open",
+})(({ theme, open }) => ({
+  "& .MuiDrawer-paper": {
+    position: "relative",
+    whiteSpace: "nowrap",
+    width: drawerWidth,
+    boxSizing: "border-box",
+    ...(!open && {
+      overflowX: "hidden",
+      width: theme.spacing(7),
+      [theme.breakpoints.up("sm")]: {
+        width: theme.spacing(9),
+      },
+    }),
+  },
+}));
 
 const MAIN_QUERY = gql`
   query Query {
@@ -72,74 +109,18 @@ interface IData {
 }
 
 const Dashboard: FC = () => {
+  const location = useLocation();
+  const { mode } = useAllState();
+  const { setMode } = useAllState();
   const [info, setInfo] = useState<IData>();
 
-  const drawerWidth: number = 240;
-
-  interface AppBarProps extends MuiAppBarProps {
-    open?: boolean;
-  }
-
-  const AppBar = styled(MuiAppBar, {
-    shouldForwardProp: (prop) => prop !== "open",
-  })<AppBarProps>(({ theme, open }) => ({
-    zIndex: theme.zIndex.drawer + 1,
-    transition: theme.transitions.create(["width", "margin"], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    ...(open && {
-      marginLeft: drawerWidth,
-      width: `calc(100% - ${drawerWidth}px)`,
-      transition: theme.transitions.create(["width", "margin"], {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-    }),
-  }));
-
-  const Drawer = styled(MuiDrawer, {
-    shouldForwardProp: (prop) => prop !== "open",
-  })(({ theme, open }) => ({
-    "& .MuiDrawer-paper": {
-      position: "relative",
-      whiteSpace: "nowrap",
-      width: drawerWidth,
-      transition: theme.transitions.create("width", {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-      boxSizing: "border-box",
-      ...(!open && {
-        overflowX: "hidden",
-        transition: theme.transitions.create("width", {
-          easing: theme.transitions.easing.sharp,
-          duration: theme.transitions.duration.leavingScreen,
-        }),
-        width: theme.spacing(7),
-        [theme.breakpoints.up("sm")]: {
-          width: theme.spacing(9),
-        },
-      }),
-    },
-  }));
-
-  ChartJS.register(ArcElement, Tooltip, Legend);
-
-  const _data = {
-    labels: info?.getMyTags.map((i) => i.name),
-    datasets: [
-      {
-        label: "# of Votes",
-        data: [12, 19, 3, 5, 2, 3],
-        backgroundColor: info?.getMyTags.map((i) => i.color),
-      },
-    ],
+  const toggleColorMode = () => {
+    if (mode === "dark") {
+      setMode("light");
+    } else {
+      setMode("dark");
+    }
   };
-
-  const arr: any[] = [];
-  const _arr = info?.getMyExpenses.filter((i) => arr.concat(i.tags));
-  console.log(_arr);
 
   const [open, setOpen] = useState(true);
   const [width, setWidth] = useState(window.innerWidth);
@@ -157,9 +138,37 @@ const Dashboard: FC = () => {
     }
   }, [width]);
 
-  const mdTheme = createTheme();
+  const _arr:
+    | { _id: number; color: string; name: string }[]
+    | undefined
+    | null
+    | any = info?.getMyExpenses.map((i) => i.tags);
+  const mergedArrayOfTags: any[] = [].concat.apply([], _arr);
+  const totalTagsName = mergedArrayOfTags.map((i) => i.name);
+  const totalTagsColor = mergedArrayOfTags.map((i) => i.color);
+  const tagNameResult = totalTagsName.reduce(function (prev, cur) {
+    prev[cur] = (prev[cur] || 0) + 1;
+    return prev;
+  }, {});
+  const tagColorResult = totalTagsColor.reduce(function (prev, cur) {
+    prev[cur] = (prev[cur] || 0) + 1;
+    return prev;
+  }, {});
 
-  const { error, loading, data } = useQuery(MAIN_QUERY, {
+  ChartJS.register(ArcElement, Tooltip, Legend);
+
+  const _data = {
+    labels: Object.keys(tagNameResult),
+    datasets: [
+      {
+        label: "# of Votes",
+        data: Object.values(tagNameResult),
+        backgroundColor: Object.keys(tagColorResult),
+      },
+    ],
+  };
+
+  const { error, loading } = useQuery(MAIN_QUERY, {
     onCompleted: setInfo,
   });
 
@@ -182,140 +191,163 @@ const Dashboard: FC = () => {
         <CircularProgress />
       </Box>
     );
-  console.log(info);
 
   return (
     <>
-      <ThemeProvider theme={mdTheme}>
-        <CssBaseline />
-        <AppBar position="absolute" open={open}>
-          <Toolbar
-            sx={{
-              pr: "24px",
-              // position:'fixed'
-            }}
-          >
-            <Typography
-              component="h1"
-              variant="h6"
-              color="inherit"
-              noWrap
-              sx={{ flexGrow: 1 }}
-            >
-              Dashboard
-            </Typography>
-            <IconButton color="inherit">
-              <Badge badgeContent={0} color="secondary">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
-            <Typography
-              component="h6"
-              fontSize="15px"
-              variant="h6"
-              noWrap
-              ml="1rem"
-            >
-              {info?.me.name}
-            </Typography>
-            {info?.me.img ? (
-              <Box
-                component="img"
-                sx={{
-                  height: 40,
-                  width: 40,
-                  maxHeight: { xs: 40, md: 40 },
-                  maxWidth: { xs: 35, md: 35 },
-                  borderRadius: "50%",
-                  mx: "10px",
-                }}
-                alt="avatar"
-                src={`http://localhost:80/${info?.me.img}`}
-              />
-            ) : null}
-          </Toolbar>
-        </AppBar>
-        <Drawer
-          variant="permanent"
-          open={open}
-          style={{
-            display: "inline-block",
-            position: "fixed",
-            height: "100%",
+      <CssBaseline />
+      <AppBar position="absolute" open={open}>
+        <Toolbar
+          sx={{
+            pr: "24px",
+            // position:'fixed'
           }}
         >
-          <Toolbar
+          <Typography
+            component="h1"
+            variant="h6"
+            color="inherit"
+            noWrap
+            sx={{ flexGrow: 1 }}
+          >
+            Dashboard
+          </Typography>
+          <IconButton color="inherit">
+            <Badge badgeContent={0} color="secondary">
+              <NotificationsIcon />
+            </Badge>
+          </IconButton>
+          <Typography
+            component="h6"
+            fontSize="15px"
+            variant="h6"
+            noWrap
+            ml="1rem"
+          >
+            {info?.me.name}
+          </Typography>
+          {info?.me.img ? (
+            <Box
+              component="img"
+              sx={{
+                height: 40,
+                width: 40,
+                maxHeight: { xs: 40, md: 40 },
+                maxWidth: { xs: 35, md: 35 },
+                borderRadius: "50%",
+                mx: "10px",
+              }}
+              alt="avatar"
+              src={`http://localhost:80/${info?.me.img}`}
+            />
+          ) : null}
+          <Box
             sx={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              px: [1],
+              borderRadius: 1,
             }}
           >
-            {open ? (
+            <IconButton
+              sx={{ ml: 1 }}
+              onClick={toggleColorMode}
+              color="inherit"
+            >
+              {mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
+            </IconButton>
+          </Box>
+        </Toolbar>
+      </AppBar>
+      <Drawer
+        variant="permanent"
+        open={open}
+        style={{
+          display: "inline-block",
+          position: "fixed",
+          height: "100%",
+        }}
+      >
+        <Toolbar
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            px: [1],
+          }}
+        >
+          {open ? (
+            <Typography
+              variant="h4"
+              my={3}
+              fontFamily="system-ui"
+              fontWeight="600"
+              align="center"
+              component="div"
+              color="gray"
+            >
+              Finance
               <Typography
-                variant="h4"
-                my={3}
+                variant="h6"
                 fontFamily="system-ui"
                 fontWeight="600"
                 align="center"
                 component="div"
                 color="gray"
               >
-                Finance
-                <Typography
-                  variant="h6"
-                  fontFamily="system-ui"
-                  fontWeight="600"
-                  align="center"
-                  component="div"
-                  color="gray"
-                >
-                  Management
-                </Typography>
+                Management
               </Typography>
-            ) : null}
-          </Toolbar>
-          <Divider />
-          <List component="nav">
-            <MainListItems />
-            <Divider sx={{ my: 1 }} />
-            <SecondaryListItems />
-          </List>
-        </Drawer>
-        {location.href === "/dashboard" ? (
-          <Box
-            pr="10px"
-            pt="80px"
-            width="100%"
+            </Typography>
+          ) : null}
+        </Toolbar>
+        <Divider />
+        <List component="nav">
+          <MainListItems />
+          <Divider sx={{ my: 1 }} />
+          <SecondaryListItems />
+        </List>
+      </Drawer>
+      {location.pathname === "/dashboard" ? (
+        <Box
+          pr="10px"
+          pt="80px"
+          width="100%"
+          sx={{
+            pl: { xs: "80px", md: "250px" },
+          }}
+        >
+          <Typography
+            variant="h4"
+            gutterBottom
+            fontFamily="system-ui"
+            fontWeight="600"
+            pb={2}
             sx={{
-              pl: { xs: "80px", md: "250px" },
+              textAlign: { xs: "center", md: "left" },
             }}
+            component="div"
           >
+            <ArrowRight
+              sx={{
+                display: { xs: "none", md: "inline" },
+              }}
+            />
+            Overview
+          </Typography>
+          <Box sx={{ p: "0 4rem 4rem" }}>
+            <Pie data={_data} />
             <Typography
-              variant="h4"
+              variant="h6"
               gutterBottom
               fontFamily="system-ui"
-              fontWeight="600"
-              pb={2}
-              sx={{
-                textAlign: { xs: "center", md: "left" },
-              }}
-              component="div"
+              fontWeight="700"
+              textAlign="center"
+              mt={3}
             >
-              <ArrowRight
-                sx={{
-                  display: { xs: "none", md: "inline" },
-                }}
-              />
-              Overview
+              Usage of each tag
             </Typography>
-            <Box sx={{ p: "2.5rem" }}>
-              <Pie data={_data} />
-            </Box>
           </Box>
-        ) : null}
-      </ThemeProvider>
+        </Box>
+      ) : null}
       <Outlet />
     </>
   );
