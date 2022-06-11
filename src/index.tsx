@@ -17,27 +17,24 @@ import Expenses from "./components/Expenses";
 import Reports from "./components/Reports";
 import CreateTags from "./components/CreateTags";
 import Profile from "./components/Profile";
-import { styled, createTheme, ThemeProvider  } from "@mui/material/styles";
+import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 
 const App = () => {
-  const { setToken } = useAllState();
-  const { token } = useAllState();
-
   const { mode } = useAllState();
   const mdTheme = createTheme();
-
   const darkTheme = createTheme({
     palette: {
       mode: "dark",
     },
   });
-
   const currentMode = mode === "dark" ? darkTheme : mdTheme;
 
+  const { setToken } = useAllState();
+  const { token } = useAllState();
   useEffect(() => {
     const cookies = new Cookies();
     const token = cookies.get("token");
@@ -48,7 +45,15 @@ const App = () => {
     <ThemeProvider theme={currentMode}>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<SignIn />}></Route>
+          <Route
+            path="/"
+            element={
+              <CheckLogin redirectTo={"/dashboard"}>
+                <SignIn />
+              </CheckLogin>
+            }
+          ></Route>
+
           <Route path="/signup" element={<SignUp />}></Route>
           <Route
             path="/dashboard"
@@ -82,6 +87,16 @@ const App = () => {
     </ThemeProvider>
   );
 };
+
+function CheckLogin({ children, redirectTo }: any) {
+  const [isLogin, setIsLogin] = useState(false);
+  const cookies = new Cookies();
+  const token = cookies.get("token");
+
+  // const { token } = useAllState();
+
+  return !token ? children : <Navigate to={redirectTo} />;
+}
 
 root.render(
   <Provider>

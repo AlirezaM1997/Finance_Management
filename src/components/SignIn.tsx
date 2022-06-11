@@ -60,7 +60,7 @@ export default function SignIn() {
         toast.success("You have successfully logged in!");
         setTimeout(() => navToDashboard("/dashboard"), 3000);
       }
-      console.log(token);
+      // console.log(token);
     } catch (error) {
       toast.error("The username or password you entered is incorrect");
       console.log(error);
