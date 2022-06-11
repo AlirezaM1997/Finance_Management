@@ -1,20 +1,14 @@
-import { Box, Typography } from "@mui/material";
 import React, { FC, useEffect, useState } from "react";
+import { gql, useMutation, useQuery } from "@apollo/client";
+
+import { Box, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import Stack from "@mui/material/Stack";
-
-import { gql, useMutation, useQuery } from "@apollo/client";
 import { CircularProgress, TextField } from "@material-ui/core";
-import {
-  AccountBox,
-  AccountBoxOutlined,
-  AccountBoxRounded,
-  ArrowRight,
-  Face,
-} from "@mui/icons-material";
+import { ArrowRight, Face } from "@mui/icons-material";
 
 const Input = styled("input")({
   display: "none",
@@ -160,10 +154,10 @@ const Profile: FC | any = () => {
             component="div"
           >
             <ArrowRight
-            sx={{
-              display: { xs: "none", md: "inline" },
-            }}
-          />
+              sx={{
+                display: { xs: "none", md: "inline" },
+              }}
+            />
             Profile Setting
           </Typography>
           <Stack

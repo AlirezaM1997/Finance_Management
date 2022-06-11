@@ -17,7 +17,7 @@ import Expenses from "./components/Expenses";
 import Reports from "./components/Reports";
 import CreateTags from "./components/CreateTags";
 import Profile from "./components/Profile";
-import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
+import { styled, createTheme, ThemeProvider  } from "@mui/material/styles";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement

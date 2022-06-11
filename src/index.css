@@ -24,9 +24,8 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
-
 /* mui */
 .MuiInputBase-input{
-  padding: 16.5px 14px !important;
+  padding: 16.5px 14px !important; 
 }
 

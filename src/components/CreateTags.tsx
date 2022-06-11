@@ -3,7 +3,7 @@ import { gql, useMutation, useQuery } from "@apollo/client";
 
 //mui
 import { CircularProgress } from "@material-ui/core";
-import { Box, Button, TextField, Typography } from "@mui/material";
+import { Box, Button, TextField, Theme, Typography } from "@mui/material";
 import ColorPicker from "material-ui-color-picker";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -17,6 +17,12 @@ import { styled } from "@mui/material/styles";
 import { ButtonProps } from "@mui/material/Button";
 import { purple } from "@mui/material/colors";
 import { ArrowRight } from "@mui/icons-material";
+import { createStyles } from "@mui/material/styles";
+import { makeStyles } from "@mui/styles";
+
+interface ITag {
+  getMyTags: [{ name: string; _id: number; color: string }];
+}
 
 /////////////Modal////////////////////
 const style = {
@@ -38,14 +44,8 @@ const ColorButton = styled(Button)<ButtonProps>(({ theme }) => ({
     backgroundColor: purple[700],
   },
 }));
-////////////////////////////////
 
-interface ITag {
-  getMyTags: [{ name: string; _id: number; color: string }];
-}
-
-///////////////////////////////
-
+////////////Query///////////////////
 const GET_TAGS_QUERY = gql`
   query Query {
     getMyTags {
@@ -73,7 +73,29 @@ const EDIT_TAG_MUTATION = gql`
   }
 `;
 
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      "& > *": {},
+    },
+    createTags: {
+      "& .MuiInput-underline::before": {
+        borderBottom: "none",
+        content: "none",
+      },
+      "& .MuiInput-underline::after": {
+        borderBottom: "none",
+      },
+      "& .MuiInputBase-input": {
+        cursor: 'pointer',
+      },
+    },
+  })
+);
+
 function CreateTags() {
+  const classes: any = useStyles();
+
   const [allTags, setAllTags] = React.useState<ITag | null>(null);
   const [color, setColor] = useState("#6B6B6B");
   const [tag, setTag] = useState("");
@@ -110,13 +132,17 @@ function CreateTags() {
   ////////Modal///////////
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+    setEditedTagColor(undefined);
+    setEditedTagName(undefined);
+  };
 
   const [currentTagIDForEdit, setCurrentTagIDForEdit] = useState<number | null>(
     null
   );
 
-  const [editedTagName, setEditedTagName] = useState(
+  const [editedTagName, setEditedTagName] = useState<string | undefined>(
     allTags?.getMyTags.filter(
       (i: { name: string; _id: number; color: string }) =>
         i._id === currentTagIDForEdit
@@ -128,10 +154,7 @@ function CreateTags() {
         i._id === currentTagIDForEdit
     )[0]?.color
   );
-
-  // console.log("editedTagName", editedTagName);
-  // console.log("editedTagColor", editedTagColor);
-  // console.log("allTags", allTags);
+  console.log(editedTagColor);
 
   const [edit_muation] = useMutation(EDIT_TAG_MUTATION);
 
@@ -164,6 +187,8 @@ function CreateTags() {
       if (status === 200) {
         refetch();
         setCurrentTagIDForEdit(null);
+        setEditedTagName(undefined);
+        setEditedTagColor(undefined);
         handleClose();
       }
     } catch (error) {
@@ -175,7 +200,6 @@ function CreateTags() {
 
   useEffect(() => {
     setAllTags(data);
-    // console.log(data);
   }, [data]);
 
   if (loading)
@@ -234,7 +258,7 @@ function CreateTags() {
           justifyContent="center"
           alignItems="center"
         >
-          <Box width="50%">
+          <Box width="50%" className={classes.createTags}>
             <TextField
               margin="normal"
               required
@@ -259,7 +283,6 @@ function CreateTags() {
                 background: color,
                 cursor: "pointer",
                 borderRadius: "0.3rem",
-                borderBottom: "none",
               }}
               value={color}
               onChange={(e) => setColor(e)}
@@ -289,7 +312,7 @@ function CreateTags() {
               {allTags?.getMyTags.map(
                 (row: { _id: number; name: string; color: string }) => (
                   <TableRow key={row._id}>
-                    <TableCell>{row.name}</TableCell>
+                    <TableCell>#{row.name}</TableCell>
                     <TableCell>
                       <Button disabled sx={{ background: row.color }}></Button>
                     </TableCell>
@@ -325,7 +348,7 @@ function CreateTags() {
       >
         <Fade in={open}>
           <Box sx={style} style={{ display: "inline-table" }}>
-            <Box>
+            <Box className={classes.createTags}>
               <TextField
                 margin="normal"
                 required
@@ -351,17 +374,22 @@ function CreateTags() {
                 name="color"
                 style={{
                   width: "100%",
-                  // background: editedTagColor,
+                  background: editedTagColor
+                    ? editedTagColor
+                    : allTags?.getMyTags.filter(
+                        (i: { name: string; _id: number; color: string }) =>
+                          i._id === currentTagIDForEdit
+                      )[0]?.color,
                   cursor: "pointer",
                   borderRadius: "0.3rem",
                   borderBottom: "none",
                 }}
-                defaultValue={
-                  allTags?.getMyTags.filter(
-                    (i: { name: string; _id: number; color: string }) =>
-                      i._id === currentTagIDForEdit
-                  )[0]?.color
-                }
+                // defaultValue={
+                //   allTags?.getMyTags.filter(
+                //     (i: { name: string; _id: number; color: string }) =>
+                //       i._id === currentTagIDForEdit
+                //   )[0]?.color
+                // }
                 value={editedTagColor}
                 onChange={(e) => setEditedTagColor(e)}
                 autoComplete="off"

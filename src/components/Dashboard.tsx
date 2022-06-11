@@ -195,11 +195,10 @@ const Dashboard: FC = () => {
   return (
     <>
       <CssBaseline />
-      <AppBar position="absolute" open={open}>
+      <AppBar position="fixed" open={open}>
         <Toolbar
           sx={{
             pr: "24px",
-            // position:'fixed'
           }}
         >
           <Typography
@@ -211,11 +210,6 @@ const Dashboard: FC = () => {
           >
             Dashboard
           </Typography>
-          <IconButton color="inherit">
-            <Badge badgeContent={0} color="secondary">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
           <Typography
             component="h6"
             fontSize="15px"
@@ -333,7 +327,7 @@ const Dashboard: FC = () => {
             />
             Overview
           </Typography>
-          <Box sx={{ p: "0 4rem 4rem" }}>
+          <Box sx={{ p: { xs: "0 4rem 4rem", md: "0 14rem 14rem" } }}>
             <Pie data={_data} />
             <Typography
               variant="h6"

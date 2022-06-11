@@ -28,6 +28,8 @@ import MenuItem from "@mui/material/MenuItem";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import { CircularProgress } from "@material-ui/core";
 import { Theme, useTheme } from "@mui/material/styles";
+import { createStyles } from "@mui/material/styles";
+import { makeStyles } from "@mui/styles";
 
 //leaflet
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
@@ -117,6 +119,20 @@ const DELETE_EXPENSE_MUTATION = gql`
     }
   }
 `;
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      "& > *": {},
+    },
+    expenses: {
+      "& .css-1howxi1-MuiTableCell-root": {
+        fontWeight: "bold",
+        fontSize: "none",
+      },
+    },
+  })
+);
 
 const Expenses = () => {
   ////////Modal///////////
@@ -208,8 +224,8 @@ const Expenses = () => {
       });
       if (status === 200) {
         refetch();
-        setTags([])
-        setDate(null)
+        setTags([]);
+        setDate(null);
         handleClose();
       }
       console.log(status);
@@ -265,11 +281,11 @@ const Expenses = () => {
   return (
     <>
       <Box
-        pr="10px"
         pt="80px"
         width="100%"
         sx={{
-          pl: { xs: "80px", md: "250px" },
+          pl: { xs: "70px", md: "250px" },
+          pr: { xs: "20px", md: "10px" },
         }}
       >
         <Typography
@@ -292,23 +308,82 @@ const Expenses = () => {
           Expenses
         </Typography>
         <Box display="flex" justifyContent="space-between" mb="15px">
-          <Title>Recent Expenses</Title>
+          <Typography
+            variant="h4"
+            fontWeight="500"
+            ml={1}
+            sx={{
+              fontSize: { xs: "0.85rem", sm: "1.25rem" },
+            }}
+            component="div"
+          >
+            Recent Expenses
+          </Typography>
           <Button
             variant="contained"
             startIcon={<FiberNew />}
             onClick={handleOpen}
+            sx={{
+              fontSize: { xs: "0.6rem", sm: "0.875rem" },
+              padding: { xs: "4px 6px", sm: "6px 16px" },
+            }}
           >
             Add New
           </Button>
         </Box>
-        <Table size="small">
+        <Table size="small" sx={{ tableLayout: "fixed" }}>
           <TableHead>
             <TableRow>
-              <TableCell style={{ fontWeight: "bold" }}>Date</TableCell>
-              <TableCell style={{ fontWeight: "bold" }}>Amount</TableCell>
-              <TableCell style={{ fontWeight: "bold" }}>Place</TableCell>
-              <TableCell style={{ fontWeight: "bold" }}>tags</TableCell>
-              <TableCell style={{ fontWeight: "bold" }}>Action</TableCell>
+              <TableCell
+                sx={{
+                  fontWeight: "bold",
+                  textAlign: "center",
+                  fontSize: { xs: "0.6rem", sm: "0.875rem" },
+                  padding: { xs: "0", sm: "6px 16px" },
+                }}
+              >
+                Date
+              </TableCell>
+              <TableCell
+                sx={{
+                  fontWeight: "bold",
+                  textAlign: "center",
+                  fontSize: { xs: "0.6rem", sm: "0.875rem" },
+                  padding: { xs: "0", sm: "6px 16px" },
+                }}
+              >
+                Amount
+              </TableCell>
+              <TableCell
+                sx={{
+                  fontWeight: "bold",
+                  textAlign: "center",
+                  fontSize: { xs: "0.6rem", sm: "0.875rem" },
+                  padding: { xs: "0", sm: "6px 16px" },
+                }}
+              >
+                Place
+              </TableCell>
+              <TableCell
+                sx={{
+                  fontWeight: "bold",
+                  textAlign: "center",
+                  fontSize: { xs: "0.6rem", sm: "0.875rem" },
+                  padding: { xs: "0", sm: "6px 16px" },
+                }}
+              >
+                tags
+              </TableCell>
+              <TableCell
+                sx={{
+                  fontWeight: "bold",
+                  textAlign: "center",
+                  fontSize: { xs: "0.6rem", sm: "0.875rem" },
+                  padding: { xs: "0", sm: "6px 16px" },
+                }}
+              >
+                Action
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -321,17 +396,48 @@ const Expenses = () => {
                 tags: { name: string; color: string }[];
               }) => (
                 <TableRow key={row._id}>
-                  <TableCell>{parsIsoDate(row.date)}</TableCell>
-                  <TableCell>{row.amount} $</TableCell>
-                  <TableCell>{row.place}</TableCell>
-                  <TableCell>
+                  <TableCell
+                    sx={{
+                      textAlign: "center",
+                      fontSize: { xs: "0.6rem", sm: "0.875rem" },
+                      padding: { xs: "0", sm: "6px 16px" },
+                    }}
+                  >
+                    {parsIsoDate(row.date)}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      textAlign: "center",
+                      fontSize: { xs: "0.6rem", sm: "0.875rem" },
+                      padding: { xs: "0", sm: "6px 16px" },
+                    }}
+                  >
+                    {row.amount} $
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      textAlign: "center",
+                      fontSize: { xs: "0.6rem", sm: "0.875rem" },
+                      padding: { xs: "0", sm: "6px 16px" },
+                    }}
+                  >
+                    {row.place}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      textAlign: "center",
+                      fontSize: { xs: "0.6rem", sm: "0.875rem" },
+                      padding: { xs: "0", sm: "6px 16px" },
+                    }}
+                  >
                     {row.tags.map(
                       (i: { name: string; color: string }, j: React.Key) => (
                         <Chip
-                          style={{
+                          sx={{
                             background: i.color,
                             color: "white",
                             margin: "0.3rem 0.3rem 0.3rem 0",
+                            fontSize: { xs: "0.6rem", sm: "0.875rem" },
                           }}
                           label={i.name}
                           key={j}
@@ -339,10 +445,19 @@ const Expenses = () => {
                       )
                     )}
                   </TableCell>
-                  <TableCell>
+                  <TableCell
+                    sx={{
+                      textAlign: "center",
+                      padding: { xs: "0", sm: "6px 16px" },
+                    }}
+                  >
                     <Button
                       onClick={() => deleteExpense(row._id)}
-                      style={{ padding: "0", justifyContent: "flex-start" }}
+                      sx={{
+                        padding: "0",
+                        justifyContent: "center",
+                        fontSize: { xs: "0.6rem", sm: "0.875rem" },
+                      }}
                     >
                       DELETE
                     </Button>
@@ -464,12 +579,7 @@ const Expenses = () => {
                   </FormControl>
                 </Grid>
                 <Grid item>
-                  <Button
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    // sx={{ mt: 3, mb: 2 }}
-                  >
+                  <Button type="submit" fullWidth variant="contained">
                     Submit
                   </Button>
                 </Grid>
@@ -523,3 +633,10 @@ const Expenses = () => {
 };
 
 export default Expenses;
+// css-6od3lo-MuiChip-label {
+//   overflow: hidden;
+//   text-overflow: ellipsis;
+//   padding-left: 4px;
+//   padding-right: 4px;
+//   white-space: nowrap;
+//   font-size: 0.6rem;

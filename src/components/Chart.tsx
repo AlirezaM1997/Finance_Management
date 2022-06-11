@@ -1,4 +1,8 @@
 import React, { useEffect } from "react";
+import { useAllState } from "../Provider";
+import { useQuery, gql } from "@apollo/client";
+
+//chart-js
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -10,10 +14,10 @@ import {
   Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+
+//mui
 import { Box } from "@mui/system";
 import { CircularProgress } from "@material-ui/core";
-import { useQuery, gql } from "@apollo/client";
-import { useAllState } from "../Provider";
 
 type MyExpenses = {
   amount: number;

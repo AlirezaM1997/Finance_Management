@@ -1,6 +1,7 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
 import Chart from "./Chart";
+
+import { Box, Typography } from "@mui/material";
 import { ArrowRight } from "@mui/icons-material";
 
 function Reports() {
