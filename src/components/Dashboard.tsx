@@ -175,7 +175,7 @@ const Dashboard: FC = () => {
   if (error)
     return (
       <h3 style={{ textAlign: "center" }}>
-        From Dashboard : You are not login!
+        Error : You are not login!
       </h3>
     );
   if (loading)
@@ -327,7 +327,15 @@ const Dashboard: FC = () => {
             />
             Overview
           </Typography>
-          <Box sx={{ p: { xs: "0 4rem 4rem", md: "0 14rem 14rem" } }}>
+          <Box
+            sx={{
+              p: {
+                sm: "0 4rem 4rem",
+                md: "0 10rem 10rem",
+                lg: "0 14rem 14rem",
+              },
+            }}
+          >
             <Pie data={_data} />
             <Typography
               variant="h6"

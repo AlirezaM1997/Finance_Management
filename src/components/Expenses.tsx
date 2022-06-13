@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { gql, useMutation, useQuery } from "@apollo/client";
+import useAsyncEffect from "use-async-effect";
 
 //mui
 import Table from "@mui/material/Table";
@@ -41,7 +42,6 @@ import markerIconPng from "leaflet/dist/images/marker-icon.png";
 import { ArrowRight, DoneOutline, FiberNew } from "@mui/icons-material";
 
 //components
-import Title from "./Title";
 import { useAllState } from "../Provider";
 
 ////////////Select Input//////////////
@@ -94,6 +94,9 @@ const MAIN_QUERY = gql`
         lon
       }
       date
+      address {
+        FormattedAddress
+      }
     }
     getMyTags {
       _id
@@ -125,12 +128,7 @@ const useStyles = makeStyles((theme: Theme) =>
     root: {
       "& > *": {},
     },
-    expenses: {
-      "& .css-1howxi1-MuiTableCell-root": {
-        fontWeight: "bold",
-        fontSize: "none",
-      },
-    },
+    expenses: {},
   })
 );
 
@@ -196,12 +194,33 @@ const Expenses = () => {
     console.log("tags", tags);
   }, [tags]);
 
-  ///////////Query/////////////////
+  ////////////Get Address///////////////
+  type asyncFunc = (lat: any, lon: any) => any;
+
+  const getAddress: asyncFunc = async (lat, lon) => {
+    const response = await fetch(
+      `https://api.neshan.org/v4/reverse?lat=${lat}&lng=${lon}`,
+      {
+        method: "GET",
+        headers: {
+          "Api-Key": "service.PYI4K3xwSKjpG9helRAKrQLrdpqsIk5tLA6spiAd",
+        },
+      }
+    );
+    const res = await response.json();
+    return String(res.formatted_address);
+  };
+
+  ///////////Query & Mutation/////////////////
   const [send_muation_new_expense] = useMutation(ADD_EXPENSE_MUTATION);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+    const _FormattedAddress = await getAddress(
+      selectedPosition[0],
+      selectedPosition[1]
+    );
     const _data = {
       amount: Number(data.get("amount")),
       tags: tags,
@@ -209,6 +228,9 @@ const Expenses = () => {
       geo: {
         lat: selectedPosition[0],
         lon: selectedPosition[1],
+      },
+      address: {
+        FormattedAddress: _FormattedAddress,
       },
     };
 
@@ -255,7 +277,7 @@ const Expenses = () => {
     }
   };
 
-  const [allData, setAllData] = React.useState<any | null>(null);
+  const [allData, setAllData] = useState<any | null>(null);
 
   const { error, loading, data, refetch } = useQuery(MAIN_QUERY);
 
@@ -263,6 +285,7 @@ const Expenses = () => {
     setAllData(data);
   }, [data]);
 
+  console.log(data);
   if (loading)
     return (
       <Box
@@ -270,7 +293,10 @@ const Expenses = () => {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          marginTop: "2rem",
+          mt: "2rem",
+          pt: "6rem",
+          pl: { xs: "70px", md: "250px" },
+          pr: { xs: "20px", md: "10px" },
         }}
       >
         <CircularProgress />
@@ -392,8 +418,9 @@ const Expenses = () => {
                 _id: number;
                 date: string;
                 amount: number;
-                place: string;
+                geo: { lat: number; lon: number };
                 tags: { name: string; color: string }[];
+                address: { FormattedAddress: string };
               }) => (
                 <TableRow key={row._id}>
                   <TableCell
@@ -405,6 +432,7 @@ const Expenses = () => {
                   >
                     {parsIsoDate(row.date)}
                   </TableCell>
+
                   <TableCell
                     sx={{
                       textAlign: "center",
@@ -419,9 +447,10 @@ const Expenses = () => {
                       textAlign: "center",
                       fontSize: { xs: "0.6rem", sm: "0.875rem" },
                       padding: { xs: "0", sm: "6px 16px" },
+                      fontFamily:'system-ui'
                     }}
                   >
-                    {row.place}
+                    {row.address.FormattedAddress}
                   </TableCell>
                   <TableCell
                     sx={{

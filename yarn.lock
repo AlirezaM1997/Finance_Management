@@ -10007,6 +10007,11 @@
   dependencies:
     "punycode" "^2.1.0"
 
+"use-async-effect@^2.2.6":
+  "integrity" "sha512-wKUpaHkuF4rzBHawP87o1KzoK2IxJ6De8fUyQ3GN2114zb4zqT87+SEbCHS+F+0inZ2Y+k6Tm1LOCQgYTSD9ww=="
+  "resolved" "https://registry.npmjs.org/use-async-effect/-/use-async-effect-2.2.6.tgz"
+  "version" "2.2.6"
+
 "use-dark-mode@^2.3.1":
   "integrity" "sha512-hmcdJR96tTustRQdaQwe6jMrZHnmPqXBxgy4jaQ4gsfhwajsCpjECuq9prgDe9XxMx/f9r96o2/md6O4Lwhwjg=="
   "resolved" "https://registry.npmjs.org/use-dark-mode/-/use-dark-mode-2.3.1.tgz"
