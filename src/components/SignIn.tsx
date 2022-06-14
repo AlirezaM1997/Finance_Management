@@ -58,7 +58,10 @@ export default function SignIn() {
         cookies.set("token", token);
         // setToken(token);
         toast.success("You have successfully logged in!");
-        setTimeout(() => {navToDashboard("/dashboard");setToken(token)}, 3000);
+        setTimeout(() => {
+          navToDashboard("/dashboard");
+          setToken(token);
+        }, 3000);
       }
       // console.log(token);
     } catch (error) {
@@ -136,7 +139,11 @@ export default function SignIn() {
           </Box>
         </Box>
       </Container>
-      <ToastContainer  pauseOnHover={false} toastStyle={{background : 'white', color:'black'}}/>
+      <ToastContainer
+        autoClose={2000}
+        pauseOnHover={false}
+        toastStyle={{ background: "white", color: "black" }}
+      />
     </ThemeProvider>
   );
 }

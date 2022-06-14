@@ -34,10 +34,12 @@ const App = () => {
   const currentMode = mode === "dark" ? darkTheme : mdTheme;
 
   const { token } = useAllState();
+  const { setToken } = useAllState();
+
   useEffect(() => {
     const cookies = new Cookies();
     const token = cookies.get("token");
-    // setToken(token);
+    setToken(token);
   }, []);
 
   return (
@@ -55,35 +57,12 @@ const App = () => {
 
           <Route path="/signup" element={<SignUp />}></Route>
 
-          
           <Route
             path="/dashboard"
             element={
-              <CheckLogin redirectTo={"/"}>
-                <SignIn />
-              </CheckLogin>
-            }
-          ></Route>
-
-
-
-          <Route
-            path="/dashboard"
-            element={
-              token ? (
+              <RequireAuth redirectTo={"/"}>
                 <Dashboard />
-              ) : (
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    marginTop: "2rem",
-                  }}
-                >
-                  <CircularProgress />
-                </Box>
-              )
+              </RequireAuth>
             }
           >
             <Route path="/dashboard/expenses" element={<Expenses />}></Route>
@@ -100,13 +79,15 @@ const App = () => {
   );
 };
 
-function CheckLogin({ children, redirectTo }: any) {
-  const [isLogin, setIsLogin] = useState(false);
-  // const cookies = new Cookies();
-  // const token = cookies.get("token");
-
+function RequireAuth({ children, redirectTo }: any) {
   const { token } = useAllState();
-console.log('%c checkLogin :','background:red', token)
+  // console.log("%c RequireAuth :", "background:red", token);
+  return token ? children : <Navigate to={redirectTo} />;
+}
+
+function CheckLogin({ children, redirectTo }: any) {
+  const { token } = useAllState();
+  // console.log("%c checkLogin :", "background:red", token);
   return !token ? children : <Navigate to={redirectTo} />;
 }
 

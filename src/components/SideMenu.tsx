@@ -62,7 +62,7 @@ export const SecondaryListItems = () => {
   const { setToken } = useAllState();
   const logOut = () => {
     cookies.remove("token");
-    setToken("");
+    // setToken("");
     window.location.href = "/";
   };
   return (
