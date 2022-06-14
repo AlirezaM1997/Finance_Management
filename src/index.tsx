@@ -33,12 +33,11 @@ const App = () => {
   });
   const currentMode = mode === "dark" ? darkTheme : mdTheme;
 
-  const { setToken } = useAllState();
   const { token } = useAllState();
   useEffect(() => {
     const cookies = new Cookies();
     const token = cookies.get("token");
-    setToken(token);
+    // setToken(token);
   }, []);
 
   return (
@@ -55,6 +54,19 @@ const App = () => {
           ></Route>
 
           <Route path="/signup" element={<SignUp />}></Route>
+
+          
+          <Route
+            path="/dashboard"
+            element={
+              <CheckLogin redirectTo={"/"}>
+                <SignIn />
+              </CheckLogin>
+            }
+          ></Route>
+
+
+
           <Route
             path="/dashboard"
             element={
@@ -90,11 +102,11 @@ const App = () => {
 
 function CheckLogin({ children, redirectTo }: any) {
   const [isLogin, setIsLogin] = useState(false);
-  const cookies = new Cookies();
-  const token = cookies.get("token");
+  // const cookies = new Cookies();
+  // const token = cookies.get("token");
 
-  // const { token } = useAllState();
-
+  const { token } = useAllState();
+console.log('%c checkLogin :','background:red', token)
   return !token ? children : <Navigate to={redirectTo} />;
 }
 

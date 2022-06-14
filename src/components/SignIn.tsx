@@ -56,9 +56,9 @@ export default function SignIn() {
       });
       if (token) {
         cookies.set("token", token);
-        setToken(token);
+        // setToken(token);
         toast.success("You have successfully logged in!");
-        setTimeout(() => navToDashboard("/dashboard"), 3000);
+        setTimeout(() => {navToDashboard("/dashboard");setToken(token)}, 3000);
       }
       // console.log(token);
     } catch (error) {
