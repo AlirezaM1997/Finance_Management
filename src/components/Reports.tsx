@@ -11,6 +11,7 @@ function Reports() {
       <Box
         pr="10px"
         pt="80px"
+        pb="70px"
         width="100%"
         display="flex"
         flexDirection="column"
