@@ -2,10 +2,11 @@
 
 ## Features of this website:
 
-#### * Register on the site and upload the post
-#### * 
-#### * 
-#### * 
+#### * register on the site and add some expense
+#### * create new tags with custom color
+#### * select the address from the map
+#### * show expenses and usage of tags on the chart
+#### * night mode
 
 
 ## The following tools have been used in this project
@@ -14,7 +15,8 @@
 - **typescript**
 - **material ui**
 - **graph ql**
-- **chart**
+- **react-leaflet**
+- **react-chartjs-2**
 
 
 ***You can see a view of some of the pages below***
