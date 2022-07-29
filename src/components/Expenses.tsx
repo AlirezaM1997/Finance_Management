@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { gql, useMutation, useQuery } from "@apollo/client";
-import useAsyncEffect from "use-async-effect";
-
 //mui
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -31,19 +29,15 @@ import { CircularProgress } from "@material-ui/core";
 import { Theme, useTheme } from "@mui/material/styles";
 import { createStyles } from "@mui/material/styles";
 import { makeStyles } from "@mui/styles";
-
 //leaflet
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { Icon, Map } from "leaflet";
 import markerIconPng from "leaflet/dist/images/marker-icon.png";
-
 //icon
 import { ArrowRight, DoneOutline, FiberNew } from "@mui/icons-material";
-
 //components
 import { useAllState } from "../Provider";
-
 ////////////Select Input//////////////
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -55,7 +49,6 @@ const MenuProps = {
     },
   },
 };
-
 function getStyles(name: string, tags: readonly string[], theme: Theme) {
   return {
     fontWeight:
@@ -64,7 +57,6 @@ function getStyles(name: string, tags: readonly string[], theme: Theme) {
         : theme.typography.fontWeightMedium,
   };
 }
-
 /////////////Modal////////////////////
 const style = {
   position: "absolute" as "absolute",
@@ -77,7 +69,6 @@ const style = {
   p: 4,
   borderRadius: 1,
 };
-
 /////////////Query//////////////
 const MAIN_QUERY = gql`
   query Query {
@@ -105,7 +96,6 @@ const MAIN_QUERY = gql`
     }
   }
 `;
-
 const ADD_EXPENSE_MUTATION = gql`
   mutation Mutation($data: ExpenseInfo!) {
     create_expense(data: $data) {
@@ -114,7 +104,6 @@ const ADD_EXPENSE_MUTATION = gql`
     }
   }
 `;
-
 const DELETE_EXPENSE_MUTATION = gql`
   mutation Mutation($id: ID!) {
     delete_expense(_id: $id) {
@@ -122,17 +111,7 @@ const DELETE_EXPENSE_MUTATION = gql`
     }
   }
 `;
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      "& > *": {},
-    },
-    expenses: {},
-  })
-);
-
-const Expenses = () => {
+export default function Expenses() {
   ////////Modal///////////
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
@@ -447,7 +426,7 @@ const Expenses = () => {
                       textAlign: "center",
                       fontSize: { xs: "0.6rem", sm: "0.875rem" },
                       padding: { xs: "0", sm: "6px 16px" },
-                      fontFamily:'system-ui'
+                      fontFamily: "system-ui",
                     }}
                   >
                     {row.address.FormattedAddress}
@@ -632,25 +611,6 @@ const Expenses = () => {
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   />
-                  {/* <Marker 
-                    position={[51.505, -0.09]}
-                    eventHandlers={{
-                      click: (e : any) => {
-                        console.log('marker clicked', e)
-                      },
-                    }}
-                    icon={
-                      new Icon({
-                        iconUrl: markerIconPng,
-                        iconSize: [25, 41],
-                        iconAnchor: [12, 41],
-                      })
-                    }
-                  >
-                    <Popup>
-                      A pretty CSS3 popup. <br /> Easily customizable.
-                    </Popup>
-                  </Marker> */}
                 </MapContainer>
               </Box>
             </Box>
@@ -659,13 +619,4 @@ const Expenses = () => {
       </Modal>
     </>
   );
-};
-
-export default Expenses;
-// css-6od3lo-MuiChip-label {
-//   overflow: hidden;
-//   text-overflow: ellipsis;
-//   padding-left: 4px;
-//   padding-right: 4px;
-//   white-space: nowrap;
-//   font-size: 0.6rem;
+}
