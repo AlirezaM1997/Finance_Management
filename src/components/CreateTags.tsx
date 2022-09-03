@@ -183,7 +183,6 @@ function CreateTags() {
           },
         },
       });
-      console.log(status);
       if (status === 200) {
         refetch();
         setCurrentTagIDForEdit(null);

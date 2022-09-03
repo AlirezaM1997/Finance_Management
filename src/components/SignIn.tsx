@@ -30,7 +30,6 @@ const LOGIN_MUTATION = gql`
 `;
 
 const theme = createTheme();
-// console.log(theme);
 
 export default function SignIn() {
   const [send_muation] = useMutation(LOGIN_MUTATION);
@@ -56,14 +55,12 @@ export default function SignIn() {
       });
       if (token) {
         cookies.set("token", token);
-        // setToken(token);
         toast.success("You have successfully logged in!");
         setTimeout(() => {
           navToDashboard("/dashboard");
           setToken(token);
         }, 3000);
       }
-      // console.log(token);
     } catch (error) {
       toast.error("The username or password you entered is incorrect");
       console.log(error);

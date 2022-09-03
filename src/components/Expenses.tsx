@@ -27,8 +27,6 @@ import MenuItem from "@mui/material/MenuItem";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import { CircularProgress } from "@material-ui/core";
 import { Theme, useTheme } from "@mui/material/styles";
-import { createStyles } from "@mui/material/styles";
-import { makeStyles } from "@mui/styles";
 //leaflet
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -116,11 +114,9 @@ export default function Expenses() {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
   ///////////Date//////////////////
   const [date, setDate] = React.useState<Date | null>(null);
   const { parsIsoDate } = useAllState();
-
   /////////Leaflet//////////
   const [initialPosition, setInitialPosition] = useState<[number, number]>([
     0, 0,
@@ -128,14 +124,12 @@ export default function Expenses() {
   const [selectedPosition, setSelectedPosition] = useState<[number, number]>([
     35.7219, 51.3347,
   ]);
-
   useEffect(() => {
     navigator.geolocation.getCurrentPosition((position) => {
       const { latitude, longitude } = position.coords;
       setInitialPosition([latitude, longitude]);
     });
   }, []);
-
   const Markers = () => {
     const map = useMapEvents({
       click(e) {
@@ -157,25 +151,20 @@ export default function Expenses() {
       />
     ) : null;
   };
-
   ////////Select Input////////////
   const theme = useTheme();
   const [tags, setTags] = React.useState<string[]>([]);
-
   const handleChange = (event: SelectChangeEvent<typeof tags>) => {
     const {
       target: { value },
     } = event;
     setTags(typeof value === "string" ? value.split(",") : value);
   };
-
   useEffect(() => {
     console.log("tags", tags);
   }, [tags]);
-
   ////////////Get Address///////////////
   type asyncFunc = (lat: any, lon: any) => any;
-
   const getAddress: asyncFunc = async (lat, lon) => {
     const response = await fetch(
       `https://api.neshan.org/v4/reverse?lat=${lat}&lng=${lon}`,
@@ -189,10 +178,8 @@ export default function Expenses() {
     const res = await response.json();
     return String(res.formatted_address);
   };
-
   ///////////Query & Mutation/////////////////
   const [send_muation_new_expense] = useMutation(ADD_EXPENSE_MUTATION);
-
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -212,7 +199,6 @@ export default function Expenses() {
         FormattedAddress: _FormattedAddress,
       },
     };
-
     try {
       const {
         data: {
@@ -229,14 +215,11 @@ export default function Expenses() {
         setDate(null);
         handleClose();
       }
-      console.log(status);
     } catch (error) {
       console.log(error);
     }
   };
-
   const [send_muation_delete_expense] = useMutation(DELETE_EXPENSE_MUTATION);
-
   const deleteExpense = async (_id: number) => {
     try {
       const {
@@ -249,22 +232,16 @@ export default function Expenses() {
         },
       });
       if (status === 200) refetch();
-
       console.log(status);
     } catch (error) {
       console.log(error);
     }
   };
-
   const [allData, setAllData] = useState<any | null>(null);
-
   const { error, loading, data, refetch } = useQuery(MAIN_QUERY);
-
   useEffect(() => {
     setAllData(data);
   }, [data]);
-
-  console.log(data);
   if (loading)
     return (
       <Box
@@ -282,7 +259,6 @@ export default function Expenses() {
       </Box>
     );
   if (error) return <p>Error :(</p>;
-
   return (
     <>
       <Box
@@ -411,7 +387,6 @@ export default function Expenses() {
                   >
                     {parsIsoDate(row.date)}
                   </TableCell>
-
                   <TableCell
                     sx={{
                       textAlign: "center",
@@ -526,7 +501,6 @@ export default function Expenses() {
                     autoFocus
                   />
                 </Grid>
-
                 <Grid item mb={3}>
                   <LocalizationProvider dateAdapter={AdapterDateFns}>
                     <DatePicker
@@ -592,10 +566,8 @@ export default function Expenses() {
                   </Button>
                 </Grid>
               </Grid>
-
               <Box p={1}>
                 <MapContainer
-                  // center={[51.505, -0.09]}
                   center={selectedPosition || initialPosition}
                   zoom={14}
                   scrollWheelZoom={false}
