@@ -26,7 +26,6 @@ const App = () => {
     },
   });
   const currentMode = mode === "dark" ? darkTheme : mdTheme;
-  const { token } = useAllState();
   const { setToken } = useAllState();
   useEffect(() => {
     const cookies = new Cookies();

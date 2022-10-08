@@ -1,4 +1,4 @@
-import React, { FC, ProviderProps, useState } from "react";
+import React, { useState } from "react";
 
 type voidFunc = (a: string) => string;
 
@@ -6,8 +6,8 @@ interface IThemeContext {
   token: string;
   setToken: (a: string) => void;
   parsIsoDate: voidFunc;
-  mode:string;
-  setMode: (a: 'light' | 'dark') => void;
+  mode: string;
+  setMode: (a: "light" | "dark") => void;
 }
 
 const defaultState = {
@@ -18,8 +18,8 @@ const defaultState = {
   parsIsoDate: () => {
     throw new Error("context out of range");
   },
-  mode:'light',
-  setMode :() => {
+  mode: "light",
+  setMode: () => {
     throw new Error("context out of range");
   },
 };
@@ -27,9 +27,9 @@ const defaultState = {
 const Context = React.createContext<IThemeContext>(defaultState);
 
 const Provider = ({ children }: any) => {
-  const [mode, setMode] = useState<'light' | 'dark'>('light');
+  const [mode, setMode] = useState<"light" | "dark">("light");
   const [token, setToken] = useState("");
-  const parsIsoDate: voidFunc =  (date: string)=> {
+  const parsIsoDate: voidFunc = (date: string) => {
     const months = [
       "Janury",
       "Februry",

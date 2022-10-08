@@ -1,10 +1,8 @@
-import React, { useState, useEffect, FC } from "react";
+import { useState, useEffect, FC } from "react";
 import { gql, useQuery } from "@apollo/client";
-import { Outlet, Link, useLocation } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { useAllState } from "../Provider";
-
-//mui
-import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import MuiDrawer from "@mui/material/Drawer";
 import Box from "@mui/material/Box";
@@ -14,24 +12,17 @@ import List from "@mui/material/List";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
-import Badge from "@mui/material/Badge";
-import NotificationsIcon from "@mui/icons-material/Notifications";
 import { MainListItems, SecondaryListItems } from "./SideMenu";
 import CircularProgress from "@mui/material/CircularProgress";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import { ArrowRight } from "@mui/icons-material";
-
-//chart
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
-
 const drawerWidth: number = 240;
-
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
 }
-
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })<AppBarProps>(({ theme, open }) => ({
@@ -41,7 +32,6 @@ const AppBar = styled(MuiAppBar, {
     width: `calc(100% - ${drawerWidth}px)`,
   }),
 }));
-
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
@@ -59,7 +49,6 @@ const Drawer = styled(MuiDrawer, {
     }),
   },
 }));
-
 const MAIN_QUERY = gql`
   query Query {
     me {
@@ -87,7 +76,6 @@ const MAIN_QUERY = gql`
     }
   }
 `;
-
 interface IData {
   me: { name: string; img: File };
   getMyExpenses: [
@@ -107,13 +95,11 @@ interface IData {
     }
   ];
 }
-
 const Dashboard: FC = () => {
   const location = useLocation();
   const { mode } = useAllState();
   const { setMode } = useAllState();
   const [info, setInfo] = useState<IData>();
-
   const toggleColorMode = () => {
     if (mode === "dark") {
       setMode("light");
@@ -121,10 +107,8 @@ const Dashboard: FC = () => {
       setMode("dark");
     }
   };
-
   const [open, setOpen] = useState(true);
   const [width, setWidth] = useState(window.innerWidth);
-
   useEffect(() => {
     const updateWindowDimensions = () => {
       const newHeight = window.innerWidth;
@@ -137,7 +121,6 @@ const Dashboard: FC = () => {
       setOpen(true);
     }
   }, [width]);
-
   const _arr:
     | { _id: number; color: string; name: string }[]
     | undefined
@@ -154,9 +137,7 @@ const Dashboard: FC = () => {
     prev[cur] = (prev[cur] || 0) + 1;
     return prev;
   }, {});
-
   ChartJS.register(ArcElement, Tooltip, Legend);
-
   const _data = {
     labels: Object.keys(tagNameResult),
     datasets: [
@@ -167,11 +148,9 @@ const Dashboard: FC = () => {
       },
     ],
   };
-
   const { error, loading } = useQuery(MAIN_QUERY, {
     onCompleted: setInfo,
   });
-
   if (error)
     return (
       <h3 style={{ textAlign: "center" }}>
@@ -191,7 +170,6 @@ const Dashboard: FC = () => {
         <CircularProgress />
       </Box>
     );
-
   return (
     <>
       <CssBaseline />
@@ -354,5 +332,4 @@ const Dashboard: FC = () => {
     </>
   );
 };
-
 export default Dashboard;
